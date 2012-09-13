@@ -53,6 +53,7 @@ public class FlickrActivity extends BaseActivity {
 		
 		 mContext.startActivity(new Intent(Intent.ACTION_VIEW, Uri
                  .parse(oauthUrl.toString())));
+		 
 		
 		// redirect user to the genreated URL.
 //		redirect(oauthUrl);
