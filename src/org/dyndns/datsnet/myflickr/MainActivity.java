@@ -1,9 +1,6 @@
 package org.dyndns.datsnet.myflickr;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
 
 import android.content.Context;
 import android.content.Intent;
@@ -11,21 +8,16 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore.Images.Media;
 import android.util.Log;
 import android.view.Menu;
 import android.widget.ImageView;
-
-import com.googlecode.flickrjandroid.Flickr;
-import com.googlecode.flickrjandroid.FlickrException;
-import com.googlecode.flickrjandroid.auth.Permission;
-import com.googlecode.flickrjandroid.oauth.OAuthToken;
 
 public class MainActivity extends BaseActivity {
 	private static final int REQUEST_GALLERY = 0;
 	private Context mContext;
 	private ImageView mImageView;
 	private final String LOG_TAG = getClass().getSimpleName();
+
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -39,54 +31,55 @@ public class MainActivity extends BaseActivity {
 
 		byte byteArray[] = null;
 
-		Log.v(LOG_TAG, "‹N“®");
-		try {
-			imageUri = Uri.parse(getIntent().getExtras()
-					.get("android.intent.extra.STREAM").toString());
-			byteArray = getIntent().getExtras().getByteArray(
-					"android.intent.extra.STREAM");
-		}
-
-		catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		if (imageUri != null) {
-			Log.v(LOG_TAG, "ˆÃ–Ù“Iintent‚©‚ç‹N“®");
-			Bitmap bmp = null;
-
-			try {
-				bmp = Media.getBitmap(getContentResolver(), imageUri);
-			}
-
-			catch (FileNotFoundException e) {
-				e.printStackTrace();
-			}
-
-			catch (IOException e) {
-				e.printStackTrace();
-			}
-
-			if (bmp != null) {
-				this.mImageView.setImageBitmap(bmp);
-			}
-
-		}
-
-		else {
-
-			Log.v(LOG_TAG, "•’Ê‚É‹N“®");
-
-		}
+		Log.v(LOG_TAG, "ï¿½Nï¿½ï¿½");
+//		try {
+//			imageUri = Uri.parse(getIntent().getExtras()
+//					.get("android.intent.extra.STREAM").toString());
+//			byteArray = getIntent().getExtras().getByteArray(
+//					"android.intent.extra.STREAM");
+//		}
+//
+//		catch (Exception e) {
+//			e.printStackTrace();
+//		}
+//
+//		if (imageUri != null) {
+//			Log.v(LOG_TAG, "ï¿½Ã–Ù“Iintentï¿½ï¿½ï¿½ï¿½Nï¿½ï¿½");
+//			Bitmap bmp = null;
+//
+//			try {
+//				bmp = Media.getBitmap(getContentResolver(), imageUri);
+//			}
+//
+//			catch (FileNotFoundException e) {
+//				e.printStackTrace();
+//			}
+//
+//			catch (IOException e) {
+//				e.printStackTrace();
+//			}
+//
+//			if (bmp != null) {
+//				this.mImageView.setImageBitmap(bmp);
+//			}
+//
+//		}
+//
+//		else {
+//
+//			Log.v(LOG_TAG, "ï¿½ï¿½ï¿½Ê‚É‹Nï¿½ï¿½");
+//
+//		}
 
 		Intent intent = new Intent();
 		intent.setClass(mContext, FlickrActivity.class);
 		intent.putExtras(getIntent());
+		startActivity(intent);
 		finish();
 		return;
 //		Log.d("API", API_KEY);
 //		Log.d("API", API_SECRET);
-//		
+//
 //		try {
 //			initialOauth();
 //		} catch (IOException e) {
@@ -98,7 +91,7 @@ public class MainActivity extends BaseActivity {
 //		}
 
 
-		// ƒMƒƒƒ‰ƒŠ[ŒÄ‚Ño‚µ
+		// ï¿½Mï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½[ï¿½Ä‚Ñoï¿½ï¿½
 		// Intent intent = new Intent();
 		// intent.setType("image/*");
 		// intent.setAction(Intent.ACTION_GET_CONTENT);
@@ -115,16 +108,16 @@ public class MainActivity extends BaseActivity {
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		// TODO Auto-generated method stub
-		Log.i("MyFlickr", "‰æ‘œ‰ÁHŠ®—¹");
+		Log.i("MyFlickr", "ï¿½æ‘œï¿½ï¿½ï¿½Hï¿½ï¿½ï¿½ï¿½");
 		if (requestCode == REQUEST_GALLERY && resultCode == RESULT_OK) {
 			try {
 				InputStream in = getContentResolver().openInputStream(
 						data.getData());
 				Bitmap img = BitmapFactory.decodeStream(in);
 				in.close();
-				Log.i("MyFlickr", "‰æ‘œ‰ÁHŠ®—¹");
+				Log.i("MyFlickr", "ï¿½æ‘œï¿½ï¿½ï¿½Hï¿½ï¿½ï¿½ï¿½");
 
-				// ‘I‘ğ‚µ‚½‰æ‘œ‚ğ•\¦
+				// ï¿½Iï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½æ‘œï¿½ï¿½\ï¿½ï¿½
 				mImageView.setImageBitmap(img);
 			} catch (Exception e) {
 
