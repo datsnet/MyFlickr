@@ -1,0 +1,13 @@
+<resources>
+
+    <!-- Flickr KEY start -->
+    <string name="api_key">e6ed45ec0ed168287b4fa21a4189e26c</string>
+    <string name="api_secret">0ac6960f1389d061</string>
+    <!-- Flickr KEY end -->
+    
+    <string name="app_name">MyFlickr</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="menu_settings">Settings</string>
+    <string name="title_activity_main">MainActivity</string>
+
+</resources>
