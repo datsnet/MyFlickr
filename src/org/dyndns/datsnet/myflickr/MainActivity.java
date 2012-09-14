@@ -108,14 +108,12 @@ public class MainActivity extends BaseActivity {
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		// TODO Auto-generated method stub
-		Log.i("MyFlickr", "�摜���H����");
 		if (requestCode == REQUEST_GALLERY && resultCode == RESULT_OK) {
 			try {
 				InputStream in = getContentResolver().openInputStream(
 						data.getData());
 				Bitmap img = BitmapFactory.decodeStream(in);
 				in.close();
-				Log.i("MyFlickr", "�摜���H����");
 
 				// �I�������摜��\��
 				mImageView.setImageBitmap(img);
