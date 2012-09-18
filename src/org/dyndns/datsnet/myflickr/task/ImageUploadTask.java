@@ -81,7 +81,7 @@ public class ImageUploadTask extends AsyncTask<String, Integer, String> {
 
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
-
+					
 				}
 			});
 			completeDialog.show();
@@ -101,10 +101,10 @@ public class ImageUploadTask extends AsyncTask<String, Integer, String> {
 
 			if (in != null) {
 				UploadMetaData uploadMetaData = new UploadMetaData();
-//				uploadMetaData.setAsync(true);
+				uploadMetaData.setAsync(true);
 				uploadMetaData.setFamilyFlag(true);
-				uploadMetaData.setPublicFlag(true);
-//				uploadMetaData.setFriendFlag(true);
+				uploadMetaData.setPublicFlag(false);
+				uploadMetaData.setFriendFlag(true);
 				try {
 					result = uploader.upload(displayName, in, uploadMetaData);
 

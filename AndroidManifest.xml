@@ -22,9 +22,8 @@
             android:label="@string/title_activity_main" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-                <action android:name="android.intent.action.SEND" />
 
-                <category android:name="android.intent.category.LAxUNCHER" />
+                <category android:name="android.intent.category.LAUNCHER" />
                 <category android:name="android.intent.category.DEFAULT" />
 
                 <data android:mimeType="image/jpeg" />
@@ -43,6 +42,12 @@
 
                 <data android:scheme="myflickr" android:host="oauth" />
 
+            </intent-filter>
+        </activity>
+        <activity android:name="SettingActivity"></activity>
+        <activity android:name="PassImageActivity">
+            <intent-filter>
+            <action android:name="android.intent.action.SEND" />
             </intent-filter>
         </activity>
     </application>

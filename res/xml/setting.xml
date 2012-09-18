@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+  <PreferenceCategory   
+    android:title="@string/public_flag_preference_title_category">  
+    <CheckBoxPreference   
+      android:key="@string/public_flag_preference"  
+      android:title="@string/title_public_flag_preference"   
+      android:summaryOn="@string/summary_on_public_flag_preference"  
+      android:summaryOff="@string/summary_off_public_flag_preference" />  
+      <!-- android:summary="@string/summary_checkbox_preference" -->  
+  </PreferenceCategory>
+
+
+
+</PreferenceScreen>

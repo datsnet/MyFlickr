@@ -10,7 +10,8 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"></uses-permission>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" >
+    </uses-permission>
 
     <application
         android:icon="@drawable/ic_launcher"
@@ -21,12 +22,10 @@
             android:label="@string/title_activity_main" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-                <action android:name="android.intent.action.SEND" />
 
-                <category android:name="android.intent.category.LAxUNCHER" />
+                <category android:name="android.intent.category.LAUNCHER" />
                 <category android:name="android.intent.category.DEFAULT" />
 
-                
                 <data android:mimeType="image/jpeg" />
                 <data android:mimeType="image/jpg" />
                 <data android:mimeType="image/png" />
@@ -34,19 +33,21 @@
                 <data android:mimeType="image/bitmap" />
             </intent-filter>
         </activity>
-                <activity
-            android:name=".FlickrActivity"
-             >
+        <activity android:name=".FlickrActivity" >
             <intent-filter>
-                <category android:name="android.intent.category.BROWSABLE" />
-                <category android:name="android.intent.category.DEFAULT" />
+                <action android:name="android.intent.action.VIEW" />
 
-                <data android:scheme="org.dyndns.datsnet.myflickr" />
-                <data android:mimeType="image/jpeg" />
-                <data android:mimeType="image/jpg" />
-                <data android:mimeType="image/png" />
-                <data android:mimeType="image/bmp" />
-                <data android:mimeType="image/bitmap" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data android:scheme="myflickr" android:host="oauth" />
+
+            </intent-filter>
+        </activity>
+        <activity android:name="SettingActivity"></activity>
+        <activity android:name="PassImageActivity">
+            <intent-filter>
+            <action android:name="android.intent.action.SEND" />
             </intent-filter>
         </activity>
     </application>

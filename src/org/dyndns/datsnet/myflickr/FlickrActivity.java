@@ -42,7 +42,6 @@ public class FlickrActivity extends BaseActivity {
 
 	private Context mContext;
 	private static final Logger logger = LoggerFactory.getLogger(FlickrActivity.class);
-	public static final String PREFS_NAME = "my-flickr";
 	private static final Uri OAUTH_CALLBACK_URI = Uri.parse(FlickrActivity.CALLBACK_SCHEME + "://oauth");
 	// public static final String CALLBACK_SCHEME =
 	// "org.dyndns.datsnet.myflickr";
@@ -73,7 +72,8 @@ public class FlickrActivity extends BaseActivity {
 			OAuthTask task = new OAuthTask(this);
 			task.execute();
 		} else {
-			load(oauth);
+//			load(oauth);
+			setUpload(mContext);
 		}
 
 	}
@@ -112,9 +112,9 @@ public class FlickrActivity extends BaseActivity {
 				}
 			}
 
-		} else if (savedToken != null && savedToken.getUser() != null) {
-
-			setUpload(mContext);
+//		} else if (savedToken != null && savedToken.getUser() != null) {
+//
+//			setUpload(mContext);
 
 		} else {
 			// try {
