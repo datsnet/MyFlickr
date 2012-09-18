@@ -77,7 +77,13 @@ public class ImageUploadTask extends AsyncTask<String, Integer, String> {
 		if (result != null) {
 			Builder completeDialog = new AlertDialog.Builder(this.context);
 			completeDialog.setMessage("アップロードが完了しました");
-			completeDialog.setPositiveButton("OK", null);
+			completeDialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+
+				}
+			});
 			completeDialog.show();
 
 		}
