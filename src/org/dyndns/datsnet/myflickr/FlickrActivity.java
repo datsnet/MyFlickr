@@ -8,24 +8,31 @@ import java.net.URL;
 import java.util.Locale;
 
 import org.dyndns.datsnet.myflickr.helper.FlickrHelper;
+import org.dyndns.datsnet.myflickr.task.GetOAuthTokenTask;
+import org.dyndns.datsnet.myflickr.task.ImageUploadTask;
 import org.dyndns.datsnet.myflickr.task.OAuthTask;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.widget.Toast;
 
 import com.googlecode.flickrjandroid.Flickr;
 import com.googlecode.flickrjandroid.FlickrException;
+import com.googlecode.flickrjandroid.RequestContext;
 import com.googlecode.flickrjandroid.auth.Permission;
 import com.googlecode.flickrjandroid.oauth.OAuth;
 import com.googlecode.flickrjandroid.oauth.OAuthToken;
 import com.googlecode.flickrjandroid.people.User;
+import com.googlecode.flickrjandroid.uploader.Uploader;
 
 /**
  * @author atsumi
@@ -45,28 +52,38 @@ public class FlickrActivity extends BaseActivity {
 	public static final String KEY_USER_NAME = "my-flickr-userName"; //$NON-NLS-1$
 	public static final String KEY_USER_ID = "my-flickr-userId"; //$NON-NLS-1$
 
+	private static Uri mImageUri;
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		this.mContext = this;
 
-        OAuth oauth = getOAuthToken();
-        // 認証情報が得られない場合OAuth認証ページへ
-        if (oauth == null || oauth.getUser() == null) {
-                OAuthTask task = new OAuthTask(this);
-                task.execute();
-        } else {
-                load(oauth);
-        }
+		try {
+			mImageUri = Uri.parse(getIntent().getExtras().get("android.intent.extra.STREAM").toString());
+		}
+
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		OAuth oauth = getOAuthToken();
+		// 認証情報が得られない場合OAuth認証ページへ
+		if (oauth == null || oauth.getUser() == null) {
+			OAuthTask task = new OAuthTask(this);
+			task.execute();
+		} else {
+			load(oauth);
+		}
 
 	}
-	
-    private void load(OAuth oauth) {
-        if (oauth != null) {
-//                new LoadUserTask(this, userIcon).execute(oauth);
-//                new LoadPhotostreamTask(this, listView).execute(oauth);
-        }
-}
+
+	private void load(OAuth oauth) {
+		if (oauth != null) {
+			// new LoadUserTask(this, userIcon).execute(oauth);
+			// new LoadPhotostreamTask(this, listView).execute(oauth);
+		}
+	}
 
 	@Override
 	public void onResume() {
@@ -85,25 +102,53 @@ public class FlickrActivity extends BaseActivity {
 				logger.debug("OAuth Token: {}; OAuth Verifier: {}", oauthToken, oauthVerifier); //$NON-NLS-1$
 
 				OAuth oauth = getOAuthToken();
-				onOAuthDone(oauth);
+				// onOAuthDone(oauth);
 
-				// if (oauth != null && oauth.getToken() != null &&
-				// oauth.getToken().getOauthTokenSecret() != null) {
-				// GetOAuthTokenTask task = new GetOAuthTokenTask(this);
-				// task.execute(oauthToken,
-				// oauth.getToken().getOauthTokenSecret(), oauthVerifier);
-				// }
+				if (oauth != null && oauth.getToken() != null && oauth.getToken().getOauthTokenSecret() != null) {
+
+					GetOAuthTokenTask task = new GetOAuthTokenTask(this);
+					task.execute(oauthToken, oauth.getToken().getOauthTokenSecret(), oauthVerifier);
+
+				}
 			}
+
+		} else if (savedToken != null && savedToken.getUser() != null) {
+
+			setUpload(mContext);
+
 		} else {
-//			try {
-//				initialOauth();
-//			} catch (IOException e) {
-//				e.printStackTrace();
-//			} catch (FlickrException e) {
-//				e.printStackTrace();
-//			}
+			// try {
+			// initialOauth();
+			// } catch (IOException e) {
+			// e.printStackTrace();
+			// } catch (FlickrException e) {
+			// e.printStackTrace();
+			// }
 		}
 
+	}
+
+	/**
+	 * アップロードを開始する
+	 */
+	public void setUpload(Context context) {
+		Uploader uploader = FlickrHelper.getInstance().getUploader();
+		if (uploader != null) {
+
+			ContentResolver contentResolver = mContext.getContentResolver();
+			String[] columns = { MediaStore.Images.Media.DATA, MediaStore.Images.Media.DISPLAY_NAME };
+			Cursor cursor = contentResolver.query(mImageUri, columns, null, null, null);
+			cursor.moveToFirst();
+			String filePath = cursor.getString(0);
+			String displayName = cursor.getString(1);
+			cursor.close();
+			logger.info(filePath);
+
+//			ImageUploadTask imageUploadTask = new ImageUploadTask(displayName, mContext, RequestContext.getRequestContext().getOAuth());
+			ImageUploadTask imageUploadTask = new ImageUploadTask(displayName, getOAuthToken(), context);
+			imageUploadTask.execute(filePath);
+
+		}
 	}
 
 	public OAuth getOAuthToken() {
@@ -148,7 +193,8 @@ public class FlickrActivity extends BaseActivity {
 					user.getUsername(), user.getId(), token.getOauthToken(), token.getOauthTokenSecret());
 			Toast.makeText(this, message, Toast.LENGTH_LONG).show();
 			saveOAuthToken(user.getUsername(), user.getId(), token.getOauthToken(), token.getOauthTokenSecret());
-//			load(result);
+
+			RequestContext.getRequestContext().setOAuth(result);
 		}
 	}
 
@@ -164,7 +210,7 @@ public class FlickrActivity extends BaseActivity {
 	}
 
 	public void initialOauth() throws IOException, FlickrException {
-//		String callBackUrl = CALLBACK_SCHEME;
+		// String callBackUrl = CALLBACK_SCHEME;
 		Flickr f = FlickrHelper.getInstance().getFlickr();
 		// get a request token from Flickr
 		// OAuthToken oauthToken =

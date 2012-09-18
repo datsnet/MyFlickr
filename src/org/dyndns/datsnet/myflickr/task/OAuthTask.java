@@ -30,92 +30,84 @@ public class OAuthTask extends AsyncTask<Void, Integer, String> {
 	private ProgressDialog dialog;
 	private OAuth oauth;
 
-    private static final Logger logger = LoggerFactory
-            .getLogger(OAuthTask.class);
-private static final Uri OAUTH_CALLBACK_URI = Uri.parse(FlickrActivity.CALLBACK_SCHEME
-            + "://oauth"); //$NON-NLS-1$
+	private static final Logger logger = LoggerFactory.getLogger(OAuthTask.class);
+	private static final Uri OAUTH_CALLBACK_URI = Uri.parse(FlickrActivity.CALLBACK_SCHEME + "://oauth"); //$NON-NLS-1$
 
-/**
-* The context.
-*/
-private Context mContext;
+	/**
+	 * The context.
+	 */
+	private Context mContext;
 
-/**
-* The progress dialog before going to the browser.
-*/
-private ProgressDialog mProgressDialog;
+	/**
+	 * The progress dialog before going to the browser.
+	 */
+	private ProgressDialog mProgressDialog;
 
-/**
-* Constructor.
-* 
-* @param context
-*/
-public OAuthTask(Context context) {
-    super();
-    this.mContext = context;
-}
+	/**
+	 * Constructor.
+	 *
+	 * @param context
+	 */
+	public OAuthTask(Context context) {
+		super();
+		this.mContext = context;
+	}
 
-@Override
-protected void onPreExecute() {
-    super.onPreExecute();
-    mProgressDialog = ProgressDialog.show(mContext,
-                    "", "Generating the authorization request..."); //$NON-NLS-1$ //$NON-NLS-2$
-    mProgressDialog.setCanceledOnTouchOutside(true);
-    mProgressDialog.setCancelable(true);
-    mProgressDialog.setOnCancelListener(new OnCancelListener() {
-            @Override
-            public void onCancel(DialogInterface dlg) {
-                    OAuthTask.this.cancel(true);
-            }
-    });
-}
+	@Override
+	protected void onPreExecute() {
+		super.onPreExecute();
+		mProgressDialog = ProgressDialog.show(mContext, "", "Generating the authorization request..."); //$NON-NLS-1$ //$NON-NLS-2$
+		mProgressDialog.setCanceledOnTouchOutside(true);
+		mProgressDialog.setCancelable(true);
+		mProgressDialog.setOnCancelListener(new OnCancelListener() {
+			@Override
+			public void onCancel(DialogInterface dlg) {
+				OAuthTask.this.cancel(true);
+			}
+		});
+	}
 
-/*
-* (non-Javadoc)
-* 
-* @see android.os.AsyncTask#doInBackground(Params[])
-*/
-@Override
-protected String doInBackground(Void... params) {
-    try {
-            Flickr f = FlickrHelper.getInstance().getFlickr();
-            OAuthToken oauthToken = f.getOAuthInterface().getRequestToken(
-                            OAUTH_CALLBACK_URI.toString());
-            saveTokenSecrent(oauthToken.getOauthTokenSecret());
-            URL oauthUrl = f.getOAuthInterface().buildAuthenticationUrl(
-                            Permission.READ, oauthToken);
-            return oauthUrl.toString();
-    } catch (Exception e) {
-            logger.error("Error to oauth", e); //$NON-NLS-1$
-            return "error:" + e.getMessage(); //$NON-NLS-1$
-    }
-}
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see android.os.AsyncTask#doInBackground(Params[])
+	 */
+	@Override
+	protected String doInBackground(Void... params) {
+		try {
+			Flickr f = FlickrHelper.getInstance().getFlickr();
+			OAuthToken oauthToken = f.getOAuthInterface().getRequestToken(OAUTH_CALLBACK_URI.toString());
+			saveTokenSecrent(oauthToken.getOauthTokenSecret());
+			URL oauthUrl = f.getOAuthInterface().buildAuthenticationUrl(Permission.WRITE, oauthToken);
+			return oauthUrl.toString();
+		} catch (Exception e) {
+			logger.error("Error to oauth", e); //$NON-NLS-1$
+			return "error:" + e.getMessage(); //$NON-NLS-1$
+		}
+	}
 
-/**
-* Saves the oauth token secrent.
-* 
-* @param tokenSecret
-*/
-private void saveTokenSecrent(String tokenSecret) {
-    logger.debug("request token: " + tokenSecret); //$NON-NLS-1$
-    FlickrActivity act = (FlickrActivity) mContext;
-    act.saveOAuthToken(null, null, null, tokenSecret);
-    logger.debug("oauth token secret saved: {}", tokenSecret); //$NON-NLS-1$
-}
+	/**
+	 * Saves the oauth token secrent.
+	 *
+	 * @param tokenSecret
+	 */
+	private void saveTokenSecrent(String tokenSecret) {
+		logger.debug("request token: " + tokenSecret); //$NON-NLS-1$
+		FlickrActivity act = (FlickrActivity) mContext;
+		act.saveOAuthToken(null, null, null, tokenSecret);
+		logger.debug("oauth token secret saved: {}", tokenSecret); //$NON-NLS-1$
+	}
 
-@Override
-protected void onPostExecute(String result) {
-    if (mProgressDialog != null) {
-            mProgressDialog.dismiss();
-    }
-    if (result != null && !result.startsWith("error") ) { //$NON-NLS-1$
-            mContext.startActivity(new Intent(Intent.ACTION_VIEW, Uri
-                            .parse(result)));
-    } else {
-            Toast.makeText(mContext, result, Toast.LENGTH_LONG).show();
-    }
-}
-
-
+	@Override
+	protected void onPostExecute(String result) {
+		if (mProgressDialog != null) {
+			mProgressDialog.dismiss();
+		}
+		if (result != null && !result.startsWith("error")) { //$NON-NLS-1$
+			mContext.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(result)));
+		} else {
+			Toast.makeText(mContext, result, Toast.LENGTH_LONG).show();
+		}
+	}
 
 }

@@ -1,7 +1,7 @@
 /**
  * BitmapUtils.java
  */
-package org.dydns.datsnet.myflickr.utils;
+package org.dyndns.datsnet.myflickr.utils;
 
 import android.content.Context;
 import android.graphics.Bitmap;

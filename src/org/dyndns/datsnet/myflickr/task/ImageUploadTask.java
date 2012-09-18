@@ -15,6 +15,7 @@ import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.DialogInterface.OnCancelListener;
 import android.os.AsyncTask;
 
 import com.googlecode.flickrjandroid.FlickrException;
@@ -28,10 +29,10 @@ public class ImageUploadTask extends AsyncTask<String, Integer, String> {
 	private Uploader uploader;;
 	private String displayName;
 	private Context context;
-	private ProgressDialog dialog;
+	private ProgressDialog mProgressDialog;
 	private OAuth oauth;
 
-	public ImageUploadTask(String displayName, Context context, OAuth oauth) {
+	public ImageUploadTask(String displayName, OAuth oauth, Context context) {
 		this.uploader = FlickrHelper.getInstance().getUploader();
 		this.displayName = displayName;
 		this.context = context;
@@ -41,26 +42,45 @@ public class ImageUploadTask extends AsyncTask<String, Integer, String> {
 
 	@Override
 	protected void onPreExecute() {
-		this.dialog = new ProgressDialog(this.context);
-		dialog.setTitle("通信中");
-		dialog.setMessage("Now Loading...");
-		dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-		dialog.show();
+//		this.dialog = new ProgressDialog(this.context);
+//		dialog.setTitle("通信中");
+//		dialog.setMessage("Now Loading...");
+//		dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+//		dialog.show();
+		super.onPreExecute();
+		mProgressDialog = ProgressDialog.show(this.context, "通信中", "Now Loading..."); //$NON-NLS-1$ //$NON-NLS-2$
+		mProgressDialog.setCanceledOnTouchOutside(true);
+		mProgressDialog.setCancelable(true);
+		mProgressDialog.setOnCancelListener(new OnCancelListener() {
+			@Override
+			public void onCancel(DialogInterface dlg) {
+				ImageUploadTask.this.cancel(true);
+			}
+		});
+
 	}
 
 	@Override
 	protected void onPostExecute(String result) {
+
+//		if (this.dialog.isShowing()) {
+//			this.dialog.dismiss();
+//		}
+		if (mProgressDialog != null) {
+			mProgressDialog.dismiss();
+		}
 		if (this.isCancelled()) {
 			result = null;
 			return;
 		}
-		this.dialog.dismiss();
 
-		Builder dialog = new AlertDialog.Builder(this.context);
-		dialog.setMessage("アップロードが完了しました");
-		dialog.setPositiveButton("OK", null);
-		dialog.show();
+		if (result != null) {
+			Builder completeDialog = new AlertDialog.Builder(this.context);
+			completeDialog.setMessage("アップロードが完了しました");
+			completeDialog.setPositiveButton("OK", null);
+			completeDialog.show();
 
+		}
 
 	}
 
@@ -75,10 +95,10 @@ public class ImageUploadTask extends AsyncTask<String, Integer, String> {
 
 			if (in != null) {
 				UploadMetaData uploadMetaData = new UploadMetaData();
-				uploadMetaData.setAsync(true);
+//				uploadMetaData.setAsync(true);
 				uploadMetaData.setFamilyFlag(true);
-				uploadMetaData.setPublicFlag(false);
-				uploadMetaData.setFriendFlag(true);
+				uploadMetaData.setPublicFlag(true);
+//				uploadMetaData.setFriendFlag(true);
 				try {
 					result = uploader.upload(displayName, in, uploadMetaData);
 
