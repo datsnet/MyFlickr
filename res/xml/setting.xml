@@ -1,15 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
-  <PreferenceCategory   
-    android:title="@string/public_flag_preference_title_category">  
-    <CheckBoxPreference   
-      android:key="@string/public_flag_preference"  
-      android:title="@string/title_public_flag_preference"   
-      android:summaryOn="@string/summary_on_public_flag_preference"  
-      android:summaryOff="@string/summary_off_public_flag_preference" />  
-      <!-- android:summary="@string/summary_checkbox_preference" -->  
-  </PreferenceCategory>
 
-
+    <PreferenceCategory android:title="@string/release_setting" >
+        <ListPreference
+            android:entries="@array/release_setting"
+            android:entryValues="@array/release_setting_value"
+            android:key="@string/release_setting_key" />
+                
+    </PreferenceCategory>
 
 </PreferenceScreen>

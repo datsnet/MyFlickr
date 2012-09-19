@@ -35,7 +35,7 @@ public class MainActivity extends BaseActivity {
 ////		return true;
 //		return super.onCreateOptionsMenu(menu);
 	}
-	
+
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 	    // Handle item selection
@@ -47,7 +47,7 @@ public class MainActivity extends BaseActivity {
 	        return super.onOptionsItemSelected(item);
 	    }
 	}
-	
+
 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {

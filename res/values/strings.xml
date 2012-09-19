@@ -4,18 +4,20 @@
     <string name="api_key">e6ed45ec0ed168287b4fa21a4189e26c</string>
     <string name="api_secret">0ac6960f1389d061</string>
     <!-- Flickr KEY end -->
-    
+
     <string name="app_name">MyFlickr</string>
     <string name="hello_world">Hello world!</string>
     <string name="menu_settings">Settings</string>
     <string name="title_activity_main">MainActivity</string>
-    
+
     <!-- 設定メニュー用 start -->
-    <string name="public_flag_preference_title_category">パブリック</string>
-    <string name="public_flag_preference">public_flag_preference</string>
-    <string name="title_public_flag_preference">パブリック</string>
-    <string name="summary_on_public_flag_preference">パブリック公開オン</string>
-    <string name="summary_off_public_flag_preference">パブリック公開オフ</string>
-    
+    <string name="release_setting_key">release_setting_key</string>
+    <string name="release_setting">公開設定</string>
+    <string name="release_setting_preference_public">公開</string>
+    <string name="release_setting_preference_not_public">非公開</string>
+    <string name="release_setting_preference_family">家族のみ</string>
+    <string name="release_setting_preference_friend">友人のみ</string>
+    <string name="release_setting_preference_family_friend">家族・友人のみ</string>
+
 
 </resources>

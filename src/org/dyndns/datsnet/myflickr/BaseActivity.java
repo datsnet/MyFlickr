@@ -36,7 +36,7 @@ public class BaseActivity extends Activity {
 //		return true;
 		return super.onCreateOptionsMenu(menu);
 	}
-	
+
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 	    // Handle item selection
@@ -51,7 +51,7 @@ public class BaseActivity extends Activity {
 
 	/**
 	 * ダイアログ表示状態を取得する。
-	 * 
+	 *
 	 * @return ダイアログ表示状態(true：表示中、false：非表示)
 	 */
 	protected boolean isDialogShowing() {
@@ -63,7 +63,7 @@ public class BaseActivity extends Activity {
 
 	/**
 	 * 標準ダイアログを表示する。
-	 * 
+	 *
 	 * @param message
 	 *            表示メッセージ
 	 */

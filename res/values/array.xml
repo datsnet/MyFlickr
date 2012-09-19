@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string-array name="release_setting">
+        <item>@string/release_setting_preference_public</item>
+        <item>@string/release_setting_preference_not_public</item>
+        <item>@string/release_setting_preference_family</item>
+        <item>@string/release_setting_preference_friend</item>
+        <item>@string/release_setting_preference_family_friend</item>
+    </string-array>
+
+        <string-array name="release_setting_value">
+        <item>@string/release_setting_preference_public</item>
+        <item>@string/release_setting_preference_not_public</item>
+        <item>@string/release_setting_preference_family</item>
+        <item>@string/release_setting_preference_friend</item>
+        <item>@string/release_setting_preference_family_friend</item>
+    </string-array>
+
+</resources>
