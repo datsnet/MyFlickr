@@ -14,8 +14,11 @@ import org.dyndns.datsnet.myflickr.task.OAuthTask;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import android.app.AlertDialog;
+import android.app.AlertDialog.Builder;
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
@@ -144,7 +147,6 @@ public class FlickrActivity extends BaseActivity {
 			cursor.close();
 			logger.info(filePath);
 
-//			ImageUploadTask imageUploadTask = new ImageUploadTask(displayName, mContext, RequestContext.getRequestContext().getOAuth());
 			ImageUploadTask imageUploadTask = new ImageUploadTask(displayName, getOAuthToken(), context);
 			imageUploadTask.execute(filePath);
 
@@ -209,27 +211,20 @@ public class FlickrActivity extends BaseActivity {
 		editor.commit();
 	}
 
-	public void initialOauth() throws IOException, FlickrException {
-		// String callBackUrl = CALLBACK_SCHEME;
-		Flickr f = FlickrHelper.getInstance().getFlickr();
-		// get a request token from Flickr
-		// OAuthToken oauthToken =
-		// f.getOAuthInterface().getRequestToken(callBackUrl);
-		OAuthToken oauthToken = f.getOAuthInterface().getRequestToken(OAUTH_CALLBACK_URI.toString());
-		// you should save the request token and token secret to a preference
-		// store for later use.
-		saveToken(oauthToken);
+	/**
+	 * アップロード完了時に呼ばれる
+	 */
+	public void uploadDone() {
+		Builder completeDialog = new AlertDialog.Builder(mContext);
+		completeDialog.setMessage("アップロードが完了しました");
+		completeDialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
 
-		// build the Authentication URL with the required permission
-		URL oauthUrl = f.getOAuthInterface().buildAuthenticationUrl(Permission.WRITE, oauthToken);
-
-		mContext.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(oauthUrl.toString())));
-
-		// redirect user to the genreated URL.
-		// redirect(oauthUrl);
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				finish();
+			}
+		});
+		completeDialog.show();
 	}
 
-	public void saveToken(OAuthToken oauthToken) {
-
-	}
 }

@@ -17,8 +17,11 @@ public class BaseActivity extends Activity {
 	// protected final String API_KEY = "e6ed45ec0ed168287b4fa21a4189e26c";
 	// protected final String API_SECRET = "0ac6960f1389d061";
 	public static final String PREFS_NAME = "my-flickr";
+	public static final String Release_FLAG_PREFERENCE = "release_flag_preference";
+
 	protected final String LOG_TAG = "MyFlickr";
 	protected AlertDialog mAlertDialog;
+
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {

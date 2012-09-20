@@ -3,6 +3,8 @@
 
     <PreferenceCategory android:title="@string/release_setting" >
         <ListPreference
+            android:title="公開設定"
+            android:summary=""
             android:entries="@array/release_setting"
             android:entryValues="@array/release_setting_value"
             android:key="@string/release_setting_key" />

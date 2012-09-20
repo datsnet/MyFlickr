@@ -49,20 +49,20 @@ public class MainActivity extends BaseActivity {
 	}
 
 
-	@Override
-	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		// TODO Auto-generated method stub
-		if (requestCode == REQUEST_GALLERY && resultCode == RESULT_OK) {
-			try {
-				Intent intent = new Intent();
-				intent.setClass(mContext, FlickrActivity.class);
-				intent.putExtras(getIntent());
-				startActivity(intent);
-				finish();
-				return;
-			} catch (Exception e) {
-
-			}
-		}
-	}
+//	@Override
+//	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+//		// TODO Auto-generated method stub
+//		if (requestCode == REQUEST_GALLERY && resultCode == RESULT_OK) {
+//			try {
+//				Intent intent = new Intent();
+//				intent.setClass(mContext, FlickrActivity.class);
+//				intent.putExtras(getIntent());
+//				startActivity(intent);
+//				finish();
+//				return;
+//			} catch (Exception e) {
+//
+//			}
+//		}
+//	}
 }

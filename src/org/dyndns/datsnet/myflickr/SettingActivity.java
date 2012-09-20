@@ -19,8 +19,6 @@ import android.preference.PreferenceActivity;
  */
 public class SettingActivity extends PreferenceActivity {
 
-	private static final String PUBLIC_FLAG_PREFERENCE = "public_flag_preference";
-
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -28,20 +26,63 @@ public class SettingActivity extends PreferenceActivity {
 
 		// CheckBoxPreference の取得
 		ListPreference listPreferrence = (ListPreference) findPreference(getString(R.string.release_setting_key));
-		listPreferrence.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
-
-			@Override
-			public boolean onPreferenceChange(Preference preference, Object newValue) {
-				// TODO Auto-generated method stub
-				SharedPreferences sp = getSharedPreferences(BaseActivity.PREFS_NAME, Context.MODE_PRIVATE);
-				Editor editor = sp.edit();
-//				editor.putString(PUBLIC_FLAG_PREFERENCE, newValue);
-				editor.putInt(PUBLIC_FLAG_PREFERENCE, (Integer) newValue);
-				editor.commit();
-				return false;
-			}
-		});
+		SharedPreferences sp = getSharedPreferences(BaseActivity.PREFS_NAME, Context.MODE_PRIVATE);
+		setReleaseValueView(listPreferrence, sp.getInt(BaseActivity.Release_FLAG_PREFERENCE, -1));
+		listPreferrence.setOnPreferenceChangeListener(onPreferenceChangeListener);
 
 	}
+
+	private boolean setReleaseValueView(Preference preference, int value) {
+
+		switch (value) {
+		case 0:
+			preference.setSummary(R.string.release_setting_preference_public);
+			break;
+		case 1:
+			preference.setSummary(R.string.release_setting_preference_not_public);
+			break;
+		case 2:
+			preference.setSummary(R.string.release_setting_preference_family);
+			break;
+		case 3:
+			preference.setSummary(R.string.release_setting_preference_friend);
+			break;
+		case 4:
+			preference.setSummary(R.string.release_setting_preference_family_friend);
+			break;
+
+		default:
+			preference.setSummary("指定なし：公開になります");
+			break;
+		}
+		return true;
+
+	}
+
+	private OnPreferenceChangeListener onPreferenceChangeListener = new OnPreferenceChangeListener() {
+
+		@Override
+		public boolean onPreferenceChange(Preference preference, Object newValue) {
+			// TODO Auto-generated method stub
+			SharedPreferences sp = getSharedPreferences(BaseActivity.PREFS_NAME, Context.MODE_PRIVATE);
+			// editor.putString(PUBLIC_FLAG_PREFERENCE, newValue);
+			Editor editor = sp.edit();
+			// return false;
+
+			if (preference.getKey().equals(getString(R.string.release_setting_key))) {
+				int value = Integer.parseInt((String) newValue);
+
+				setReleaseValueView(preference, value);
+
+				editor.putInt(BaseActivity.Release_FLAG_PREFERENCE, value);
+				editor.commit();
+
+				return true;
+			}
+
+			return false;
+
+		}
+	};
 
 }
