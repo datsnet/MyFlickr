@@ -3,22 +3,13 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
 
-    <TextView
-        android:id="@+id/textView1"
+    <Button
+        android:id="@+id/get_from_gallery"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"
-        android:text="@string/hello_world"
-        tools:context=".MainActivity" />
-
-    <ImageView
-        android:id="@+id/filickrImage"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/textView1"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="75dp"
-        android:src="@drawable/ic_action_search" />
+        android:layout_marginTop="129dp"
+        android:text="@string/main_get_from_gallery" />
 
 </RelativeLayout>

@@ -25,22 +25,31 @@ import com.googlecode.flickrjandroid.oauth.OAuth;
 import com.googlecode.flickrjandroid.uploader.UploadMetaData;
 import com.googlecode.flickrjandroid.uploader.Uploader;
 
-public class ImageUploadTask extends AsyncTask<String, Integer, String> {
+public class ImageUploadTask extends AsyncTask<Void, Integer, String[]> {
 
 	private Uploader uploader;;
-	private String displayName;
 	private Context context;
 	private ProgressDialog mProgressDialog;
 	private OAuth oauth;
 	private FlickrActivity activity;
+	private String filePaths[];
+	private String fileNames[];
 
-	public ImageUploadTask(String displayName, OAuth oauth, Context context) {
+	public ImageUploadTask(OAuth oauth, Context context) {
 		this.uploader = FlickrHelper.getInstance().getUploader();
-		this.displayName = displayName;
 		this.context = context;
 		this.activity = (FlickrActivity) context;
 
 		this.oauth = oauth;
+	}
+
+	public ImageUploadTask(String filePaths[], String fileNames[], OAuth oauth, Context context) {
+		this.filePaths = filePaths;
+		this.fileNames = fileNames;
+		this.oauth = oauth;
+		this.uploader = FlickrHelper.getInstance().getUploader();
+		this.context = context;
+		this.activity = (FlickrActivity) context;
 	}
 
 	@Override
@@ -64,7 +73,7 @@ public class ImageUploadTask extends AsyncTask<String, Integer, String> {
 	}
 
 	@Override
-	protected void onPostExecute(String result) {
+	protected void onPostExecute(String[] results) {
 
 		// if (this.dialog.isShowing()) {
 		// this.dialog.dismiss();
@@ -73,21 +82,22 @@ public class ImageUploadTask extends AsyncTask<String, Integer, String> {
 			mProgressDialog.dismiss();
 		}
 		if (this.isCancelled()) {
-			result = null;
+			results = null;
 			return;
 		}
 
-		if (result != null) {
-//			Builder completeDialog = new AlertDialog.Builder(this.context);
-//			completeDialog.setMessage("アップロードが完了しました");
-//			completeDialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-//
-//				@Override
-//				public void onClick(DialogInterface dialog, int which) {
-//
-//				}
-//			});
-//			completeDialog.show();
+		if (results != null) {
+			// Builder completeDialog = new AlertDialog.Builder(this.context);
+			// completeDialog.setMessage("アップロードが完了しました");
+			// completeDialog.setPositiveButton("OK", new
+			// DialogInterface.OnClickListener() {
+			//
+			// @Override
+			// public void onClick(DialogInterface dialog, int which) {
+			//
+			// }
+			// });
+			// completeDialog.show();
 			this.activity.uploadDone();
 
 		}
@@ -95,81 +105,167 @@ public class ImageUploadTask extends AsyncTask<String, Integer, String> {
 	}
 
 	@Override
-	protected String doInBackground(String... params) {
+	protected String[] doInBackground(Void... params) {
 		RequestContext.getRequestContext().setOAuth(oauth);
-		File file = new File(params[0]);
-		InputStream in = null;
-		String result = null;
-		try {
-			in = new FileInputStream(file);
+		int count = 0;
+		String results[] = new String[filePaths.length];
+		for (String filePath : this.filePaths) {
 
-			if (in != null) {
+			File file = new File(filePath);
+			String fileName = fileNames[count];
+			InputStream in = null;
+			try {
+				in = new FileInputStream(file);
 
-				SharedPreferences sp = this.context.getSharedPreferences(BaseActivity.PREFS_NAME, Context.MODE_PRIVATE);
-				int releaseValue = sp.getInt(BaseActivity.Release_FLAG_PREFERENCE, 0);
-				UploadMetaData uploadMetaData = new UploadMetaData();
+				if (in != null) {
 
-				// 公開設定
-				switch (releaseValue) {
-				case 0:
-					// パブリック
-					uploadMetaData.setPublicFlag(true);
-					uploadMetaData.setFamilyFlag(true);
-					uploadMetaData.setFriendFlag(true);
-					break;
-				case 1:
-					// 非公開
-					uploadMetaData.setPublicFlag(false);
-					uploadMetaData.setFamilyFlag(false);
-					uploadMetaData.setFriendFlag(false);
-					break;
-				case 2:
-					// 家族
-					uploadMetaData.setPublicFlag(false);
-					uploadMetaData.setFamilyFlag(true);
-					uploadMetaData.setFriendFlag(false);
-					break;
-				case 3:
-					// 友達
-					uploadMetaData.setPublicFlag(false);
-					uploadMetaData.setFamilyFlag(false);
-					uploadMetaData.setFriendFlag(true);
-					break;
-				case 4:
-					uploadMetaData.setPublicFlag(false);
-					uploadMetaData.setFamilyFlag(true);
-					uploadMetaData.setFriendFlag(true);
-					break;
+					SharedPreferences sp = this.context.getSharedPreferences(BaseActivity.PREFS_NAME, Context.MODE_PRIVATE);
+					int releaseValue = sp.getInt(BaseActivity.Release_FLAG_PREFERENCE, 0);
+					UploadMetaData uploadMetaData = new UploadMetaData();
 
-				default:
-					break;
+					// 公開設定
+					switch (releaseValue) {
+					case 0:
+						// パブリック
+						uploadMetaData.setPublicFlag(true);
+						uploadMetaData.setFamilyFlag(true);
+						uploadMetaData.setFriendFlag(true);
+						break;
+					case 1:
+						// 非公開
+						uploadMetaData.setPublicFlag(false);
+						uploadMetaData.setFamilyFlag(false);
+						uploadMetaData.setFriendFlag(false);
+						break;
+					case 2:
+						// 家族
+						uploadMetaData.setPublicFlag(false);
+						uploadMetaData.setFamilyFlag(true);
+						uploadMetaData.setFriendFlag(false);
+						break;
+					case 3:
+						// 友達
+						uploadMetaData.setPublicFlag(false);
+						uploadMetaData.setFamilyFlag(false);
+						uploadMetaData.setFriendFlag(true);
+						break;
+					case 4:
+						uploadMetaData.setPublicFlag(false);
+						uploadMetaData.setFamilyFlag(true);
+						uploadMetaData.setFriendFlag(true);
+						break;
+
+					default:
+						break;
+					}
+
+					uploadMetaData.setAsync(true);
+					try {
+						results[count] = uploader.upload(fileName, in, uploadMetaData);
+
+					} catch (IOException e) {
+						// TODO 自動生成された catch ブロック
+						e.printStackTrace();
+					} catch (FlickrException e) {
+						// TODO 自動生成された catch ブロック
+						e.printStackTrace();
+					} catch (SAXException e) {
+						// TODO 自動生成された catch ブロック
+						e.printStackTrace();
+					}
 				}
+				in.close();
 
-				uploadMetaData.setAsync(true);
-				try {
-					result = uploader.upload(displayName, in, uploadMetaData);
-
-				} catch (IOException e) {
-					// TODO 自動生成された catch ブロック
-					e.printStackTrace();
-				} catch (FlickrException e) {
-					// TODO 自動生成された catch ブロック
-					e.printStackTrace();
-				} catch (SAXException e) {
-					// TODO 自動生成された catch ブロック
-					e.printStackTrace();
-				}
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO 自動生成された catch ブロック
+				e.printStackTrace();
 			}
-			in.close();
-
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO 自動生成された catch ブロック
-			e.printStackTrace();
+			count++;
 		}
-
-		return result;
+		return results;
 	}
+
+	// @Override
+	// protected String doInBackground(String... params) {
+	// RequestContext.getRequestContext().setOAuth(oauth);
+	// File file = new File(params[0]);
+	// String fileName = params[1];
+	// InputStream in = null;
+	// String result = null;
+	// try {
+	// in = new FileInputStream(file);
+	//
+	// if (in != null) {
+	//
+	// SharedPreferences sp =
+	// this.context.getSharedPreferences(BaseActivity.PREFS_NAME,
+	// Context.MODE_PRIVATE);
+	// int releaseValue = sp.getInt(BaseActivity.Release_FLAG_PREFERENCE, 0);
+	// UploadMetaData uploadMetaData = new UploadMetaData();
+	//
+	// // 公開設定
+	// switch (releaseValue) {
+	// case 0:
+	// // パブリック
+	// uploadMetaData.setPublicFlag(true);
+	// uploadMetaData.setFamilyFlag(true);
+	// uploadMetaData.setFriendFlag(true);
+	// break;
+	// case 1:
+	// // 非公開
+	// uploadMetaData.setPublicFlag(false);
+	// uploadMetaData.setFamilyFlag(false);
+	// uploadMetaData.setFriendFlag(false);
+	// break;
+	// case 2:
+	// // 家族
+	// uploadMetaData.setPublicFlag(false);
+	// uploadMetaData.setFamilyFlag(true);
+	// uploadMetaData.setFriendFlag(false);
+	// break;
+	// case 3:
+	// // 友達
+	// uploadMetaData.setPublicFlag(false);
+	// uploadMetaData.setFamilyFlag(false);
+	// uploadMetaData.setFriendFlag(true);
+	// break;
+	// case 4:
+	// uploadMetaData.setPublicFlag(false);
+	// uploadMetaData.setFamilyFlag(true);
+	// uploadMetaData.setFriendFlag(true);
+	// break;
+	//
+	// default:
+	// break;
+	// }
+	//
+	// uploadMetaData.setAsync(true);
+	// try {
+	// result = uploader.upload(fileName, in, uploadMetaData);
+	//
+	// } catch (IOException e) {
+	// // TODO 自動生成された catch ブロック
+	// e.printStackTrace();
+	// } catch (FlickrException e) {
+	// // TODO 自動生成された catch ブロック
+	// e.printStackTrace();
+	// } catch (SAXException e) {
+	// // TODO 自動生成された catch ブロック
+	// e.printStackTrace();
+	// }
+	// }
+	// in.close();
+	//
+	// } catch (FileNotFoundException e) {
+	// e.printStackTrace();
+	// } catch (IOException e) {
+	// // TODO 自動生成された catch ブロック
+	// e.printStackTrace();
+	// }
+	//
+	// return result;
+	// }
 
 }

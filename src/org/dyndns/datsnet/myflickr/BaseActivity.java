@@ -18,6 +18,8 @@ public class BaseActivity extends Activity {
 	// protected final String API_SECRET = "0ac6960f1389d061";
 	public static final String PREFS_NAME = "my-flickr";
 	public static final String Release_FLAG_PREFERENCE = "release_flag_preference";
+	public static final int REQUEST_GALLERY = 0;
+	public static final String URI_LIST_KEY = "uri_list_key";
 
 	protected final String LOG_TAG = "MyFlickr";
 	protected AlertDialog mAlertDialog;

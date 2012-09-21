@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.AsyncTask;
 
 import com.googlecode.flickrjandroid.Flickr;
@@ -51,7 +52,7 @@ public class GetOAuthTokenTask extends AsyncTask<String, Integer, OAuth> {
 	protected void onPostExecute(OAuth result) {
 		if (activity != null) {
 			activity.onOAuthDone(result);
-			activity.setUpload(this.context);
+//			activity.setUpload(this.context);
 		}
 	}
 

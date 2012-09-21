@@ -3,10 +3,10 @@
  */
 package org.dyndns.datsnet.myflickr;
 
-import java.io.IOException;
-import java.net.URL;
+import java.util.ArrayList;
 import java.util.Locale;
 
+import org.dyndns.datsnet.myclickr.entity.ImageListEntity;
 import org.dyndns.datsnet.myflickr.helper.FlickrHelper;
 import org.dyndns.datsnet.myflickr.task.GetOAuthTokenTask;
 import org.dyndns.datsnet.myflickr.task.ImageUploadTask;
@@ -28,10 +28,7 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.widget.Toast;
 
-import com.googlecode.flickrjandroid.Flickr;
-import com.googlecode.flickrjandroid.FlickrException;
 import com.googlecode.flickrjandroid.RequestContext;
-import com.googlecode.flickrjandroid.auth.Permission;
 import com.googlecode.flickrjandroid.oauth.OAuth;
 import com.googlecode.flickrjandroid.oauth.OAuthToken;
 import com.googlecode.flickrjandroid.people.User;
@@ -55,18 +52,30 @@ public class FlickrActivity extends BaseActivity {
 	public static final String KEY_USER_ID = "my-flickr-userId"; //$NON-NLS-1$
 
 	private static Uri mImageUri;
+	private static ArrayList<Uri> mImageUriList;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		this.mContext = this;
+		setContentView(R.layout.activity_flickr);
 
 		try {
-			mImageUri = Uri.parse(getIntent().getExtras().get("android.intent.extra.STREAM").toString());
+//			ImageListEntity.getInstance();
+			// mImageUri =
+			// Uri.parse(getIntent().getExtras().get("android.intent.extra.STREAM").toString());
+			// mImageUri = Uri.parse(getIntent().getStringExtra(URI_LIST_KEY));
+//			mImageUriList = (ArrayList<Uri>) getIntent().getExtras().get(URI_LIST_KEY);
+			ImageListEntity imageListEntity = ImageListEntity.getInstance();
+			if (ImageListEntity.getInstance().getmImageUriList() == null) {
+				imageListEntity.setmImageUriList((ArrayList<Uri>) getIntent().getExtras().get(URI_LIST_KEY));
+			}
 		}
 
 		catch (Exception e) {
 			e.printStackTrace();
+			Toast.makeText(this, "画像を取得できませんでした。", Toast.LENGTH_LONG).show();
+			return;
 		}
 
 		OAuth oauth = getOAuthToken();
@@ -75,7 +84,7 @@ public class FlickrActivity extends BaseActivity {
 			OAuthTask task = new OAuthTask(this);
 			task.execute();
 		} else {
-//			load(oauth);
+			// load(oauth);
 			setUpload(mContext);
 		}
 
@@ -115,9 +124,9 @@ public class FlickrActivity extends BaseActivity {
 				}
 			}
 
-//		} else if (savedToken != null && savedToken.getUser() != null) {
-//
-//			setUpload(mContext);
+			// } else if (savedToken != null && savedToken.getUser() != null) {
+			//
+			// setUpload(mContext);
 
 		} else {
 			// try {
@@ -140,15 +149,30 @@ public class FlickrActivity extends BaseActivity {
 
 			ContentResolver contentResolver = mContext.getContentResolver();
 			String[] columns = { MediaStore.Images.Media.DATA, MediaStore.Images.Media.DISPLAY_NAME };
-			Cursor cursor = contentResolver.query(mImageUri, columns, null, null, null);
-			cursor.moveToFirst();
-			String filePath = cursor.getString(0);
-			String displayName = cursor.getString(1);
-			cursor.close();
-			logger.info(filePath);
 
-			ImageUploadTask imageUploadTask = new ImageUploadTask(displayName, getOAuthToken(), context);
-			imageUploadTask.execute(filePath);
+//			String filePaths[] = new String[mImageUriList.size()];
+//			String fileNames[] = new String[mImageUriList.size()];
+			ImageListEntity imageListEntity = ImageListEntity.getInstance();
+			ArrayList<Uri> imageUriList = imageListEntity.getmImageUriList();
+			String filePaths[] = new String[imageListEntity.getmImageUriList().size()];
+			String fileNames[] = new String[imageListEntity.getmImageUriList().size()];
+
+
+			int count = 0;
+			for (Uri imageUri : imageUriList) {
+				Cursor cursor = contentResolver.query(imageUri, columns, null, null, null);
+				cursor.moveToFirst();
+//				String filePath = cursor.getString(0);
+//				String displayName = cursor.getString(1);
+				filePaths[count] = cursor.getString(0);
+				fileNames[count] = cursor.getString(1);
+				cursor.close();
+//				logger.info(filePath);
+				count++;
+			}
+
+			ImageUploadTask imageUploadTask = new ImageUploadTask(filePaths, fileNames, getOAuthToken(), context);
+			imageUploadTask.execute();
 
 		}
 	}
@@ -217,6 +241,10 @@ public class FlickrActivity extends BaseActivity {
 	public void uploadDone() {
 		Builder completeDialog = new AlertDialog.Builder(mContext);
 		completeDialog.setMessage("アップロードが完了しました");
+
+		// 選択した画像を初期化
+		ImageListEntity.getInstance().initialize();
+
 		completeDialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
 
 			@Override

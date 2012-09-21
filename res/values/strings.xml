@@ -20,4 +20,7 @@
     <string name="release_setting_preference_family_friend">家族・友人のみ</string>
 
 
+    <!-- メイン画面用 -->
+    <string name="main_get_from_gallery">ギャラリーから写真を取得</string>
+
 </resources>

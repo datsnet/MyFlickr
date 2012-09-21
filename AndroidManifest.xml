@@ -51,6 +51,15 @@
                 <data android:mimeType="image/bmp" />
                 <data android:mimeType="image/bitmap" />
             </intent-filter>
+                        <intent-filter>
+                <action android:name="android.intent.action.SEND_MULTIPLE" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="image/jpeg" />
+                <data android:mimeType="image/jpg" />
+                <data android:mimeType="image/png" />
+                <data android:mimeType="image/bmp" />
+                <data android:mimeType="image/bitmap" />
+            </intent-filter>
         </activity>
     </application>
 
