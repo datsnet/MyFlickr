@@ -52,7 +52,7 @@ public class GetOAuthTokenTask extends AsyncTask<String, Integer, OAuth> {
 	protected void onPostExecute(OAuth result) {
 		if (activity != null) {
 			activity.onOAuthDone(result);
-//			activity.setUpload(this.context);
+			activity.setUpload(this.context);
 		}
 	}
 

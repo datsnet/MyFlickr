@@ -1,4 +1,4 @@
-package org.dyndns.datsnet.myclickr.entity;
+package org.dyndns.datsnet.myflickr.entity;
 
 import java.util.ArrayList;
 
