@@ -2,24 +2,38 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical" >
+    android:orientation="vertical"
+    android:padding="50dp" >
 
     <Button
         android:id="@+id/mail_btn"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="メールを送信" />
+        android:text="メールを送信"
+        android:padding="20dp"
+        android:layout_marginBottom="20dp" />
 
     <Button
         android:id="@+id/browser_btn"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="ブラウザで開く" />
+        android:text="ブラウザで開く"
+        android:padding="20dp"
+        android:layout_marginBottom="20dp" />
 
     <Button
         android:id="@+id/link_copy_btn"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="リンクをクリップボードにコピー" />
+        android:text="リンクをクリップボードにコピー"
+        android:padding="20dp"
+        android:layout_marginBottom="20dp" />
+
+        <Button
+        android:id="@+id/close_btn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="閉じる"
+        android:padding="20dp" />
 
 </LinearLayout>

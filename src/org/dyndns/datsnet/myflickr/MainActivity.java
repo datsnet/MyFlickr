@@ -8,11 +8,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
-import android.widget.ImageView;
 
 public class MainActivity extends BaseActivity {
 	private Context mContext;
-	private ImageView mImageView;
 	private final String LOG_TAG = getClass().getSimpleName();
 
 	@Override
@@ -22,8 +20,11 @@ public class MainActivity extends BaseActivity {
 		this.mContext = this;
 
 		Button getPictureFromGallery = (Button) findViewById(R.id.get_from_gallery);
+		Button getPictureFromCustomGallery = (Button) findViewById(R.id.get_from_custom_gallery);
+		Button settingBtn = (Button) findViewById(R.id.setting_button);
 		getPictureFromGallery.setOnClickListener(mOnClickGalleryButtonListener);
-
+		getPictureFromCustomGallery.setOnClickListener(mOnClickCusomGalleryButtonListener);
+		settingBtn.setOnClickListener(mOnClickSettingButtonListener);
 	}
 
 	@Override
@@ -54,23 +55,44 @@ public class MainActivity extends BaseActivity {
 			Intent intent = new Intent();
 			intent.setType("image/*");
 			intent.setAction(Intent.ACTION_GET_CONTENT);
-//			intent.setAction(Intent.ACTION_SEND_MULTIPLE);
 			startActivityForResult(intent, REQUEST_GALLERY);
 
 		}
 	};
 
+	private OnClickListener mOnClickCusomGalleryButtonListener = new OnClickListener() {
+
+		@Override
+		public void onClick(View v) {
+			// ギャラリーに遷移
+			Intent intent = new Intent(mContext, SelectImageGalleryActivity.class);
+			startActivity(intent);
+
+			startActivityForResult(intent, REQUEST_GALLERY);
+
+		}
+	};
+
+	private OnClickListener mOnClickSettingButtonListener = new OnClickListener() {
+
+		@Override
+		public void onClick(View v) {
+			// 設定メニューへ
+			startSettingMenu();
+
+		}
+	};
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if (requestCode == REQUEST_GALLERY && resultCode == RESULT_OK) {
 			try {
 				Intent intent = new Intent();
-//				intent.setClass(mContext, FlickrActivity.class);
+				// intent.setClass(mContext, FlickrActivity.class);
 				intent.setClass(mContext, PassImageActivity.class);
 				data.putExtra(URI_LIST_KEY, data.getDataString());
 				intent.putExtras(data);
 				startActivity(intent);
-				finish();
+//				finish();
 				return;
 			} catch (Exception e) {
 

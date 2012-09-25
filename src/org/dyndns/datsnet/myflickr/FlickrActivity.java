@@ -4,26 +4,20 @@
 package org.dyndns.datsnet.myflickr;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Locale;
 
-import org.dyndns.datsnet.myflickr.dialog.FinishDialog;
 import org.dyndns.datsnet.myflickr.entity.ImageListEntity;
 import org.dyndns.datsnet.myflickr.helper.FlickrHelper;
 import org.dyndns.datsnet.myflickr.task.GetOAuthTokenTask;
 import org.dyndns.datsnet.myflickr.task.ImageUploadTask;
 import org.dyndns.datsnet.myflickr.task.OAuthTask;
-import org.json.JSONException;
+import org.dyndns.datsnet.myflickr.task.PhotoAccessTask;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import android.app.AlertDialog;
-import android.app.AlertDialog.Builder;
 import android.content.ContentResolver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
@@ -33,8 +27,6 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.widget.Toast;
 
-import com.googlecode.flickrjandroid.Flickr;
-import com.googlecode.flickrjandroid.FlickrException;
 import com.googlecode.flickrjandroid.RequestContext;
 import com.googlecode.flickrjandroid.oauth.OAuth;
 import com.googlecode.flickrjandroid.oauth.OAuthToken;
@@ -49,7 +41,6 @@ public class FlickrActivity extends BaseActivity {
 
 	private Context mContext;
 	private static final Logger logger = LoggerFactory.getLogger(FlickrActivity.class);
-	private static final Uri OAUTH_CALLBACK_URI = Uri.parse(FlickrActivity.CALLBACK_SCHEME + "://oauth");
 	// public static final String CALLBACK_SCHEME =
 	// "org.dyndns.datsnet.myflickr";
 	public static final String CALLBACK_SCHEME = "myflickr";
@@ -58,9 +49,6 @@ public class FlickrActivity extends BaseActivity {
 	public static final String KEY_USER_NAME = "my-flickr-userName"; //$NON-NLS-1$
 	public static final String KEY_USER_ID = "my-flickr-userId"; //$NON-NLS-1$
 
-	private static Uri mImageUri;
-	private static ArrayList<Uri> mImageUriList;
-
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -68,11 +56,6 @@ public class FlickrActivity extends BaseActivity {
 		setContentView(R.layout.activity_flickr);
 
 		try {
-//			ImageListEntity.getInstance();
-			// mImageUri =
-			// Uri.parse(getIntent().getExtras().get("android.intent.extra.STREAM").toString());
-			// mImageUri = Uri.parse(getIntent().getStringExtra(URI_LIST_KEY));
-//			mImageUriList = (ArrayList<Uri>) getIntent().getExtras().get(URI_LIST_KEY);
 			ImageListEntity imageListEntity = ImageListEntity.getInstance();
 			if (ImageListEntity.getInstance().getmImageUriList() == null) {
 				imageListEntity.setmImageUriList((ArrayList<Uri>) getIntent().getExtras().get(URI_LIST_KEY));
@@ -87,31 +70,23 @@ public class FlickrActivity extends BaseActivity {
 
 		OAuth oauth = getOAuthToken();
 		// 認証情報が得られない場合OAuth認証ページへ
-//		if (oauth == null || oauth.getUser() == null) {
 		Intent intent = getIntent();
 		String scheme = intent.getScheme();
 		if (scheme == null && oauth != null) {
 			setUpload(mContext);
 		} else if (scheme == null || oauth == null) {
-//		if (oauth.getToken().getOauthTokenSecret() == null || oauth.getUser() == null) {
 			OAuthTask task = new OAuthTask(this);
 			task.execute();
 		}
 
 	}
 
-	private void load(OAuth oauth) {
-		if (oauth != null) {
-			// new LoadUserTask(this, userIcon).execute(oauth);
-			// new LoadPhotostreamTask(this, listView).execute(oauth);
-		}
+	@Override
+	protected void onNewIntent(Intent intent) {
+		// this is very important, otherwise you would get a null Scheme in the
+		// onResume later on.
+		setIntent(intent);
 	}
-
-    @Override
-    protected void onNewIntent(Intent intent) {
-            //this is very important, otherwise you would get a null Scheme in the onResume later on.
-            setIntent(intent);
-    }
 
 	@Override
 	public void onResume() {
@@ -139,18 +114,6 @@ public class FlickrActivity extends BaseActivity {
 				}
 			}
 
-			// } else if (savedToken != null && savedToken.getUser() != null) {
-			//
-			// setUpload(mContext);
-
-		} else {
-			// try {
-			// initialOauth();
-			// } catch (IOException e) {
-			// e.printStackTrace();
-			// } catch (FlickrException e) {
-			// e.printStackTrace();
-			// }
 		}
 
 	}
@@ -170,7 +133,6 @@ public class FlickrActivity extends BaseActivity {
 			int arrSize = imageListEntity.getmImageUriList().size();
 			String filePaths[] = new String[arrSize];
 			String fileNames[] = new String[arrSize];
-
 
 			int count = 0;
 			ArrayList<File> targetFiles = new ArrayList<File>();
@@ -252,46 +214,11 @@ public class FlickrActivity extends BaseActivity {
 	 */
 	public void uploadDone(OAuth oauth, ArrayList<String> photoIds) {
 
-//		new FinishDialog(mContext, "タイトル", "本文").show();
 		// 選択した画像を初期化
 		ImageListEntity.getInstance().initialize();
 
-		OAuthToken token = oauth.getToken();
-		Flickr flickr = FlickrHelper.getInstance().getFlickrAuthed(token.getOauthToken(),
-                token.getOauthTokenSecret());
-		String photoId = null;
-		if (photoIds.size() == 1) {
-			photoId = photoIds.get(0);
-		}
-		String url = null;
-		try {
-			url = flickr.getPhotosInterface().getPhoto(photoId).getLargeUrl();
-		} catch (IOException e) {
-			// TODO 自動生成された catch ブロック
-			e.printStackTrace();
-		} catch (FlickrException e) {
-			// TODO 自動生成された catch ブロック
-			e.printStackTrace();
-		} catch (JSONException e) {
-			// TODO 自動生成された catch ブロック
-			e.printStackTrace();
-		}
-		ArrayList<String> urlList = new ArrayList<String>();
-		urlList.add(url);
-		new FinishDialog(mContext, urlList).show();
-
-//		Builder completeDialog = new AlertDialog.Builder(mContext);
-//		completeDialog.setMessage("アップロードが完了しました");
-
-//
-//		completeDialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-//
-//			@Override
-//			public void onClick(DialogInterface dialog, int which) {
-//				finish();
-//			}
-//		});
-//		completeDialog.show();
+		PhotoAccessTask task = new PhotoAccessTask(this, oauth);
+		task.execute(photoIds.toArray(new String[0]));
 	}
 
 }

@@ -99,20 +99,15 @@ public class ImageUploadTask extends AsyncTask<Void, Integer, ArrayList<String>>
 	protected ArrayList<String> doInBackground(Void... params) {
 		RequestContext.getRequestContext().setOAuth(oauth);
 		int count = 0;
-//		String results[] = new String[this.files.size()];
 		ArrayList<String> results = new ArrayList<String>();
 		UploadMetaData uploadMetaData = setMetaUploadData();
 
-		int fileSize = 0;
-		for (int i = 0, listSize = this.files.size(); i < listSize; i++) {
-			fileSize += this.files.get(i).length();
-		}
+//		int fileSize = 0;
+//		for (int i = 0, listSize = this.files.size(); i < listSize; i++) {
+//			fileSize += this.files.get(i).length();
+//		}
 
 		for (File targetFile : this.files) {
-//			int progress = fileSize
-			int progress = 100 / (this.files.size() + count);
-			Log.i("progress", String.valueOf(progress));
-			publishProgress(progress);
 			String fileName = targetFile.getName();
 			InputStream in = null;
 			try {
@@ -121,8 +116,8 @@ public class ImageUploadTask extends AsyncTask<Void, Integer, ArrayList<String>>
 				if (in != null) {
 
 					try {
-//						results[count] = uploader.upload(fileName, in, uploadMetaData);
-						results.add(uploader.upload(fileName, in, uploadMetaData));
+						String result = uploader.upload(fileName, in, uploadMetaData);
+						results.add(result);
 
 					} catch (IOException e) {
 						// TODO 自動生成された catch ブロック
@@ -143,8 +138,16 @@ public class ImageUploadTask extends AsyncTask<Void, Integer, ArrayList<String>>
 				// TODO 自動生成された catch ブロック
 				e.printStackTrace();
 			}
+
+			// プログレスダイアログ更新
+			int progress = 100 / (this.files.size() + count);
+			Log.i("progress", String.valueOf(progress));
+			publishProgress(progress);
+
+
 			count++;
 		}
+
 		publishProgress(100);
 		return results;
 	}

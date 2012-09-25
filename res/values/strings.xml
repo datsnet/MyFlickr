@@ -21,6 +21,8 @@
 
 
     <!-- メイン画面用 -->
+    <string name="main_get_from_custom_gallery">(工事中)リストから写真を取得(工事中)</string>
     <string name="main_get_from_gallery">ギャラリーから写真を取得</string>
+    <string name="main_setting">設定画面</string>
 
 </resources>

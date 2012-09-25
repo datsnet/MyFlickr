@@ -20,6 +20,9 @@ public class BaseActivity extends Activity {
 	public static final String Release_FLAG_PREFERENCE = "release_flag_preference";
 	public static final int REQUEST_GALLERY = 0;
 	public static final String URI_LIST_KEY = "uri_list_key";
+	public static final String KEY_DIALOG_SEND_MAIL = "key_dialog_send_mail";
+	public static final String KEY_DIALOG_SHOW_BROWSER = "key_dialog_show_browser";
+	public static final String KEY_DIALOG_COPY_CLIPBOARD = "key_dialog_copy_clipboard";
 
 	protected final String LOG_TAG = "MyFlickr";
 	protected AlertDialog mAlertDialog;

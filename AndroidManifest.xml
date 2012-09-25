@@ -10,8 +10,9 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" >
-    </uses-permission>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_PROVIDER"/>
+    <uses-permission android:name="android.permission.READ_ATTACHMENT"/>
 
     <application
         android:icon="@drawable/ic_launcher"
@@ -28,9 +29,10 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-        <activity android:name=".FlickrActivity" >
+        <activity android:name=".FlickrActivity">
             <intent-filter>
-                <action android:name="android.intent.action.VIEW"
+                <action
+                    android:name="android.intent.action.VIEW"
                     android:launchMode="singleTask" />
 
                 <category android:name="android.intent.category.DEFAULT" />
@@ -46,16 +48,20 @@
         <activity android:name=".PassImageActivity" >
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />
+
                 <category android:name="android.intent.category.DEFAULT" />
+
                 <data android:mimeType="image/jpeg" />
                 <data android:mimeType="image/jpg" />
                 <data android:mimeType="image/png" />
                 <data android:mimeType="image/bmp" />
                 <data android:mimeType="image/bitmap" />
             </intent-filter>
-                        <intent-filter>
+            <intent-filter>
                 <action android:name="android.intent.action.SEND_MULTIPLE" />
+
                 <category android:name="android.intent.category.DEFAULT" />
+
                 <data android:mimeType="image/jpeg" />
                 <data android:mimeType="image/jpg" />
                 <data android:mimeType="image/png" />
@@ -63,6 +69,7 @@
                 <data android:mimeType="image/bitmap" />
             </intent-filter>
         </activity>
+        <activity android:name=".SelectImageGalleryActivity"></activity>
     </application>
 
 </manifest>
