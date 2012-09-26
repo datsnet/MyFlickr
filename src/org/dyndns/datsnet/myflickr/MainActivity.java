@@ -64,12 +64,9 @@ public class MainActivity extends BaseActivity {
 
 		@Override
 		public void onClick(View v) {
-			// ギャラリーに遷移
-			Intent intent = new Intent(mContext, SelectImageGalleryActivity.class);
+			// カスタムギャラリー
+			Intent intent = new Intent(mContext, SelectImageActivity.class);
 			startActivity(intent);
-
-			startActivityForResult(intent, REQUEST_GALLERY);
-
 		}
 	};
 

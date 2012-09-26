@@ -18,6 +18,7 @@ import android.os.Parcelable;
 public class PassImageActivity extends BaseActivity {
 	private Context mContext;
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -38,13 +39,16 @@ public class PassImageActivity extends BaseActivity {
 			for (Parcelable parcel : dataList) {
 				imageUriList.add((Uri) parcel);
 			}
-		} else {
+		} else if (data.getExtras().get(Intent.EXTRA_STREAM) != null) {
 			// ギャラリーから単数選択した場合
 			if (data.getExtras().get(Intent.EXTRA_STREAM) != null) {
 				imageUriList.add(Uri.parse(data.getExtras().get(Intent.EXTRA_STREAM).toString()));
 			} else {
 				imageUriList.add(Uri.parse((String) data.getExtras().get(URI_LIST_KEY)));
 			}
+		} else if (data.getExtras().get(INTENT_SELECT_IMAGE) != null) {
+			// 画像選択から選択した場合
+			imageUriList = (ArrayList<Uri>) data.getExtras().get(INTENT_SELECT_IMAGE);
 		}
 
 		// intent.putExtras(getIntent());
@@ -52,6 +56,25 @@ public class PassImageActivity extends BaseActivity {
 		startActivity(intent);
 		finish();
 		return;
+	}
+
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		// TODO 自動生成されたメソッド・スタブ
+		super.onActivityResult(requestCode, resultCode, data);
+
+//		if (REQUEST_SELECT_IMAGE == requestCode) {
+//			ArrayList<Uri> imageUriList = new ArrayList<Uri>();
+//			imageUriList = (ArrayList<Uri>) data.getExtras().get(INTENT_SELECT_IMAGE);
+//
+//			Intent intent = new Intent();
+//			intent.setClass(mContext, FlickrActivity.class);
+//			intent.putExtra(URI_LIST_KEY, imageUriList);
+//			startActivity(intent);
+//			finish();
+//			return;
+//		}
 
 	}
+
 }

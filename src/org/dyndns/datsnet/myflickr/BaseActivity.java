@@ -23,6 +23,8 @@ public class BaseActivity extends Activity {
 	public static final String KEY_DIALOG_SEND_MAIL = "key_dialog_send_mail";
 	public static final String KEY_DIALOG_SHOW_BROWSER = "key_dialog_show_browser";
 	public static final String KEY_DIALOG_COPY_CLIPBOARD = "key_dialog_copy_clipboard";
+	public static final int REQUEST_SELECT_IMAGE = 99;
+	public static final String INTENT_SELECT_IMAGE = "intent_select_image";
 
 	protected final String LOG_TAG = "MyFlickr";
 	protected AlertDialog mAlertDialog;
