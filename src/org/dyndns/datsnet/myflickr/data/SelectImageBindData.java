@@ -4,9 +4,9 @@ import android.net.Uri;
 
 
 public class SelectImageBindData {
-	private int id;
-	private boolean isSelected = false;
-	private Uri uri;
+	protected int id;
+	protected boolean isSelected = false;
+	protected Uri uri;
 	public SelectImageBindData() {
 
 	}

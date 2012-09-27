@@ -71,6 +71,7 @@
         </activity>
         <activity android:name=".SelectImageGalleryActivity"></activity>
         <activity android:name="SelectImageActivity"></activity>
+        <activity android:name="SelectAlbumActivity"></activity>
     </application>
 
 </manifest>

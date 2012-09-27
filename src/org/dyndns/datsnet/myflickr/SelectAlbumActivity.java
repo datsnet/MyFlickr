@@ -1,18 +1,24 @@
 package org.dyndns.datsnet.myflickr;
 
+import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-import org.dyndns.datsnet.myflickr.adapter.SelectImageAdapter;
+import org.dyndns.datsnet.myflickr.adapter.SelectAlbumAdapter;
 import org.dyndns.datsnet.myflickr.cache.ImageCache;
+import org.dyndns.datsnet.myflickr.data.SelectAlbumBindData;
 import org.dyndns.datsnet.myflickr.data.SelectImageBindData;
+import org.dyndns.datsnet.myflickr.utils.FileUtils;
 import org.dyndns.datsnet.myflickr.utils.StringUtils;
 
-import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.provider.MediaStore.MediaColumns;
 import android.view.View;
@@ -26,9 +32,9 @@ import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-public class SelectImageActivity extends BaseActivity {
+public class SelectAlbumActivity extends BaseActivity {
 
-	private static final String LOG_TAG = SelectImageActivity.class.getSimpleName();
+	private static final String LOG_TAG = SelectAlbumActivity.class.getSimpleName();
 	private Context mContext;
 	private GridView mGridView = null;
 
@@ -37,7 +43,7 @@ public class SelectImageActivity extends BaseActivity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_select_image);
+		setContentView(R.layout.activity_select_album);
 		mContext = this;
 
 		// 画像キャッシュクリア
@@ -55,36 +61,65 @@ public class SelectImageActivity extends BaseActivity {
 		// StrictMode.ThreadPolicy.Builder().detectAll().penaltyLog().build());
 		// }
 
-		final String[] columns = { MediaStore.Images.Media.DATA, MediaStore.Images.Media._ID };
-		final String sort = MediaColumns.DATE_MODIFIED + " DESC";
-		Cursor cursor = managedQuery(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, columns, null, null, sort);
-		int image_column_index = cursor.getColumnIndex(MediaStore.Images.Media._ID);
-		int imageListSize = cursor.getCount();
-		ArrayList<SelectImageBindData> bindList = new ArrayList<SelectImageBindData>();
-		for (int i = 0; i < imageListSize; i++) {
-			cursor.moveToPosition(i);
-			SelectImageBindData bindData = new SelectImageBindData();
-			String path = cursor.getString(cursor.getColumnIndex(MediaStore.Images.Media.DATA));
-			Uri uriPath = ContentUris.withAppendedId(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, cursor.getLong(cursor.getColumnIndexOrThrow(MediaColumns._ID)));
-			int dataColumnIndex = cursor.getColumnIndex(MediaStore.Images.Media.DATA);
+		// 検索するディレクトリパスをセット
+		String searchDir = Environment.getExternalStorageDirectory().getPath();
+		List<String> dirList = FileUtils.getFolderPath(Environment.getExternalStorageDirectory().getPath());
+//		Collections.sort(dirList, null);
+		Uri uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
 
-			bindData.setId(cursor.getInt(image_column_index));
-			bindData.setUri(uriPath);
-			bindList.add(bindData);
 
-			// thumbnails[i] = MediaStore.Images.Thumbnails.getThumbnail(
-			// getApplicationContext().getContentResolver(), id,
-			// MediaStore.Images.Thumbnails.MICRO_KIND, null);
-			// arrPath[i]= imagecursor.getString(dataColumnIndex);
+//		String[] columns = { MediaColumns.DATA, MediaColumns.DISPLAY_NAME, MediaColumns._ID, MediaColumns.DATA, MediaColumns.DATE_MODIFIED,  MediaStore.Images.ImageColumns.ORIENTATION };
+//		String selection = MediaColumns.MIME_TYPE + " = ? AND " + MediaColumns.DATA + " like " + "'" + dirList.get(i) + System.getProperty("file.separator") + "%'" + " AND " + MediaColumns.DATA + "  NOT LIKE ( '" + searchDir + "/android%' )";
+
+
+		List<SelectAlbumBindData> dataList = new ArrayList<SelectAlbumBindData>();
+
+		for (int i = 0; i < dirList.size(); i++) {
+
+			String[] projection = { MediaColumns.DATA, MediaColumns.DISPLAY_NAME, MediaColumns._ID, MediaColumns.DATE_MODIFIED,  MediaStore.Images.ImageColumns.ORIENTATION };
+			String selection = MediaColumns.MIME_TYPE + " = ? AND " + MediaColumns.DATA + " like " + "'" + dirList.get(i) + System.getProperty("file.separator") + "%'" + " AND " + MediaColumns.DATA + "  NOT LIKE ( '" + searchDir + "/android%' )";
+			String[] selectionArgs = { "image/*" };
+			String sort = MediaColumns.DATE_MODIFIED + " ASC";
+			try {
+				Cursor cursor = managedQuery(uri, projection, null, null, sort);
+				if (cursor != null) {
+
+					boolean isDataPresent = cursor.moveToFirst();
+					SelectAlbumBindData data = new SelectAlbumBindData();
+
+					if (isDataPresent) {
+						// 画像ディレクトリ名と画像数を設定
+						File file = new File(cursor.getString(cursor.getColumnIndex(MediaStore.Images.Media.DATA)));
+
+						// 画像を格納しているカレントディレクトリ名を取得する
+						// jpgファイルが格納されているディレクトリ名を取得
+						String[] strSplitList = dirList.get(i).split(System.getProperty("file.separator"));
+						String currentPathOfFileWithoutFileName = null;
+						if (strSplitList.length > 1) {
+							currentPathOfFileWithoutFileName = strSplitList[strSplitList.length - 1];
+						} else {
+							currentPathOfFileWithoutFileName = strSplitList[0];
+						}
+						data.setAlbumPath(file.getAbsolutePath());
+						data.setAlbumName(currentPathOfFileWithoutFileName);
+						data.setId((int) cursor.getLong(cursor.getColumnIndexOrThrow(MediaColumns._ID)));
+						dataList.add(data);
+
+
+					}
+				}
+
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		}
+
 		Button doneBtn = (Button) findViewById(R.id.done_btn);
 		doneBtn.setOnClickListener(mOnDoneBtnListener);
-		Button albumBtn = (Button) findViewById(R.id.album_btn);
-		albumBtn.setOnClickListener(mOnAlbumBtnListener);
 		mGridView = (GridView) findViewById(R.id.gridView);
 		mGridView.setOnItemClickListener(mOnItemClickListener);
 		mGridView.setOnItemLongClickListener(mOnItemLongClickListener);
-		SelectImageAdapter imageAdapter = new SelectImageAdapter(mContext, R.layout.item_grid_view, bindList);
+		SelectAlbumAdapter imageAdapter = new SelectAlbumAdapter(mContext, R.layout.item_grid_album_view, dataList);
 		mGridView.setAdapter(imageAdapter);
 	}
 
@@ -101,7 +136,7 @@ public class SelectImageActivity extends BaseActivity {
 			if (!data.isSelected()) {
 				data.setSelected(true);
 
-				SelectImageActivity.this.selectedDataList.add(data);
+				SelectAlbumActivity.this.selectedDataList.add(data);
 
 //				selectedThumbView.setImageResource(android.R.drawable.presence_online);
 				selectedThumbView.setImageResource(R.drawable.selected_badge);
@@ -109,9 +144,9 @@ public class SelectImageActivity extends BaseActivity {
 				data.setSelected(false);
 				selectedThumbView.setImageBitmap(null);
 
-				for (int i = 0, size = SelectImageActivity.this.selectedDataList.size(); i < size; i++) {
-					if (data.getUri().toString().equals(SelectImageActivity.this.selectedDataList.get(i).getUri().toString())) {
-						SelectImageActivity.this.selectedDataList.remove(i);
+				for (int i = 0, size = SelectAlbumActivity.this.selectedDataList.size(); i < size; i++) {
+					if (data.getUri().toString().equals(SelectAlbumActivity.this.selectedDataList.get(i).getUri().toString())) {
+						SelectAlbumActivity.this.selectedDataList.remove(i);
 						break;
 					}
 				}
@@ -141,13 +176,13 @@ public class SelectImageActivity extends BaseActivity {
 		public void onClick(View view) {
 
 			ArrayList<Uri> uriList = new ArrayList<Uri>();
-			int size = SelectImageActivity.this.selectedDataList.size();
+			int size = SelectAlbumActivity.this.selectedDataList.size();
 			if (size <= 0) {
 				finish();
 				return;
 			}
 			for (int i = 0; i < size; i++) {
-				uriList.add(SelectImageActivity.this.selectedDataList.get(i).getUri());
+				uriList.add(SelectAlbumActivity.this.selectedDataList.get(i).getUri());
 			}
 			Toast.makeText(mContext, "選択した画像" + uriList.toString(), Toast.LENGTH_LONG).show();
 
@@ -159,19 +194,5 @@ public class SelectImageActivity extends BaseActivity {
 
 		}
 	};
-
-	private OnClickListener mOnAlbumBtnListener = new OnClickListener() {
-
-		@Override
-		public void onClick(View view) {
-
-			Intent intent = new Intent(mContext, SelectAlbumActivity.class);
-			startActivity(intent);
-
-			finish();
-
-		}
-	};
-
 
 }

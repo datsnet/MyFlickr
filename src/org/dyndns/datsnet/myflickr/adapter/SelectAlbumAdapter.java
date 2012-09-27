@@ -6,7 +6,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import org.dyndns.datsnet.myflickr.R;
-import org.dyndns.datsnet.myflickr.data.SelectImageBindData;
+import org.dyndns.datsnet.myflickr.data.SelectAlbumBindData;
 
 import android.content.Context;
 import android.util.Log;
@@ -15,10 +15,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.TextView;
 
-public class SelectImageAdapter extends ArrayAdapter<SelectImageBindData> {
+public class SelectAlbumAdapter extends ArrayAdapter<SelectAlbumBindData> {
 
-	private static final String LOG_TAG = SelectImageAdapter.class.getSimpleName();
+	private static final String LOG_TAG = SelectAlbumAdapter.class.getSimpleName();
 
 	private Context mContext;
 
@@ -37,22 +38,7 @@ public class SelectImageAdapter extends ArrayAdapter<SelectImageBindData> {
 
 	private LiloBlockingDeque<Runnable> mQueue = null;
 
-	// public SelectImageAdapter(Context context, int layoutId,
-	// List<SelectImageBindData>
-	// objects) {
-	// super(context, 0, objects);
-	//
-	// this.mContext = context;
-	// this.inflater = (LayoutInflater)
-	// context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-	// this.mLayoutId = layoutId;
-	//
-	// mQueue = new LiloBlockingDeque<Runnable>();
-	// mThreadPool = new ThreadPoolExecutor(mPoolSize, mMaxPoolSize,
-	// mKeepAliveTime, TimeUnit.SECONDS, mQueue);
-	// }
-
-	public SelectImageAdapter(Context context, int layoutId, List<SelectImageBindData> data) {
+	public SelectAlbumAdapter(Context context, int layoutId, List<SelectAlbumBindData> data) {
 		super(context, 0, data);
 
 		this.mContext = context;
@@ -63,59 +49,28 @@ public class SelectImageAdapter extends ArrayAdapter<SelectImageBindData> {
 		mThreadPool = new ThreadPoolExecutor(mPoolSize, mMaxPoolSize, mKeepAliveTime, TimeUnit.SECONDS, mQueue);
 	}
 
+
 	@Override
 	public View getView(final int position, View convertView, ViewGroup parent) {
 		final ViewHolder holder;
 		if (convertView == null) {
 			convertView = inflater.inflate(mLayoutId, parent, false);
 			holder = new ViewHolder();
-			holder.imageView = (ImageView) convertView.findViewById(R.id.thumbImage);
-			// holder.imageView.setOnClickListener(new OnClickListener() {
-			//
-			// public void onClick(View view) {
-			// // TODO Auto-generated method stub
-			// // int id = v.getId();
-			// // Intent intent = new Intent();
-			// // intent.setAction(Intent.ACTION_VIEW);
-			// // intent.setDataAndType(Uri.parse("file://" + arrPath[id]),
-			// "image/*");
-			// // startActivity(intent);
-			// SelectImageBindData data = getItem(position);
-			// if (!data.isSelected) {
-			// holder.thumbImageView.setImageResource(android.R.drawable.presence_online);
-			// } else {
-			// holder.thumbImageView.setImageBitmap(null);
-			// }
-			//
-			// }
-			// });
-			// holder.imageView.setOnLongClickListener(new OnLongClickListener()
-			// {
-			//
-			// @Override
-			// public boolean onLongClick(View view) {
-			// int id = view.getId();
-			// Intent intent = new Intent();
-			// intent.setAction(Intent.ACTION_VIEW);
-			// // intent.setDataAndType(Uri.parse("file://" + arrPath[id]),
-			// "image/*");
-			// mContext.startActivity(intent);
-			// return false;
-			// }
-			// });
-			holder.thumbImageView = (ImageView) convertView.findViewById(R.id.select_thumb);
+			holder.thumbImageView = (ImageView) convertView.findViewById(R.id.thumbImage);
+			holder.thumbTitle = (TextView) convertView.findViewById(R.id.thumbTitle);
 			convertView.setTag(holder);
 		} else {
 			holder = (ViewHolder) convertView.getTag();
 		}
-		SelectImageBindData data = getItem(position);
+		SelectAlbumBindData data = getItem(position);
 		// holder.textView.setText(data.title);
-		holder.imageView.setImageBitmap(null);
-		holder.imageView.setTag(data.getUri().hashCode());
-		holder.imageView.invalidate();
 		holder.thumbImageView.setImageBitmap(null);
+		holder.thumbImageView.setTag(data.getAlbumPath().hashCode());
 		holder.thumbImageView.invalidate();
-		GridViewImageLoader imageLoader = new GridViewImageLoader(this.mContext, holder.imageView, holder.thumbImageView, data);
+
+		holder.thumbTitle.setText(data.getAlbumName());
+
+		GridViewImageLoader imageLoader = new GridViewImageLoader(this.mContext, holder.thumbImageView, null, data);
 		mQueue.add(imageLoader);
 		this.mThreadPool.execute(imageLoader);
 		Log.i(LOG_TAG, "Task count.." + this.mQueue.size());
@@ -132,8 +87,8 @@ public class SelectImageAdapter extends ArrayAdapter<SelectImageBindData> {
 	}
 
 	static class ViewHolder {
-		ImageView imageView;
 		ImageView thumbImageView;
+		TextView thumbTitle;
 	}
 	public class LiloBlockingDeque<E> extends LinkedBlockingDeque<E> {
 
@@ -178,6 +133,4 @@ public class SelectImageAdapter extends ArrayAdapter<SelectImageBindData> {
 			super.putFirst(e);
 		}
 	}
-
-
 }

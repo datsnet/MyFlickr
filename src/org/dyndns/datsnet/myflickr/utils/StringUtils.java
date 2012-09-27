@@ -22,6 +22,9 @@ public class StringUtils {
 	public static String sendForm(ArrayList<String> targetList) {
 		String result = "";
 		for (int i = 0, size = targetList.size(); i < size; i++) {
+			if (size == 0) {
+				break;
+			}
 			result += (size == i) ? targetList.get(i) : targetList.get(i) + "\n";
 		}
 
