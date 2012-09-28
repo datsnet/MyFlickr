@@ -74,14 +74,16 @@ public class SelectAlbumActivity extends BaseActivity {
 
 		List<SelectAlbumBindData> dataList = new ArrayList<SelectAlbumBindData>();
 
+
+
 		for (int i = 0; i < dirList.size(); i++) {
 
 			String[] projection = { MediaColumns.DATA, MediaColumns.DISPLAY_NAME, MediaColumns._ID, MediaColumns.DATE_MODIFIED,  MediaStore.Images.ImageColumns.ORIENTATION };
 			String selection = MediaColumns.MIME_TYPE + " = ? AND " + MediaColumns.DATA + " like " + "'" + dirList.get(i) + System.getProperty("file.separator") + "%'" + " AND " + MediaColumns.DATA + "  NOT LIKE ( '" + searchDir + "/android%' )";
-			String[] selectionArgs = { "image/*" };
+			String[] selectionArgs = { "image/jpeg" };
 			String sort = MediaColumns.DATE_MODIFIED + " ASC";
 			try {
-				Cursor cursor = managedQuery(uri, projection, null, null, sort);
+				Cursor cursor = managedQuery(uri, projection, selection, selectionArgs, sort);
 				if (cursor != null) {
 
 					boolean isDataPresent = cursor.moveToFirst();
@@ -138,8 +140,8 @@ public class SelectAlbumActivity extends BaseActivity {
 
 				SelectAlbumActivity.this.selectedDataList.add(data);
 
-//				selectedThumbView.setImageResource(android.R.drawable.presence_online);
-				selectedThumbView.setImageResource(R.drawable.selected_badge);
+				selectedThumbView.setImageResource(android.R.drawable.presence_online);
+//				selectedThumbView.setImageResource(R.drawable.selected_badge);
 			} else {
 				data.setSelected(false);
 				selectedThumbView.setImageBitmap(null);

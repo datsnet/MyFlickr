@@ -31,7 +31,7 @@ public class SelectImageAdapter extends ArrayAdapter<SelectImageBindData> {
 //	private int mMaxPoolSize = 5;
 	private int mMaxPoolSize = 128;
 
-	private long mKeepAliveTime = 5;
+	private long mKeepAliveTime = 1;
 
 	private ThreadPoolExecutor mThreadPool = null;
 
@@ -116,9 +116,9 @@ public class SelectImageAdapter extends ArrayAdapter<SelectImageBindData> {
 		holder.thumbImageView.setImageBitmap(null);
 		holder.thumbImageView.invalidate();
 		GridViewImageLoader imageLoader = new GridViewImageLoader(this.mContext, holder.imageView, holder.thumbImageView, data);
-		mQueue.add(imageLoader);
+//		mQueue.add(imageLoader);
 		this.mThreadPool.execute(imageLoader);
-		Log.i(LOG_TAG, "Task count.." + this.mQueue.size());
+//		Log.i(LOG_TAG, "Task count.." + this.mQueue.size());
 		convertView.invalidate();
 
 		return convertView;

@@ -71,7 +71,7 @@ public class SelectAlbumAdapter extends ArrayAdapter<SelectAlbumBindData> {
 		holder.thumbTitle.setText(data.getAlbumName());
 
 		GridViewImageLoader imageLoader = new GridViewImageLoader(this.mContext, holder.thumbImageView, null, data);
-		mQueue.add(imageLoader);
+//		mQueue.add(imageLoader);
 		this.mThreadPool.execute(imageLoader);
 		Log.i(LOG_TAG, "Task count.." + this.mQueue.size());
 		convertView.invalidate();
