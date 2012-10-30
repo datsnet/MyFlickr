@@ -77,18 +77,22 @@ public class BaseActivity extends Activity {
 	 * @param message
 	 *            表示メッセージ
 	 */
-	public void showDefaultDialog(final String message) {
+	public void showDefaultDialog(final String message, OnClickListener onClickListener) {
 		if (isDialogShowing()) {
 			// ダイアログの多重起動防止
 			return;
 		}
+		
+		// nullの場合ダイアログをcloseするリスナーをつける
+		onClickListener = onClickListener == null ? mCloseBtnOnClickListener : onClickListener; 
+		
 		// リソースからメッセージやボタンのラベルを取得する。
 		String doneBtn = "OK";
 
 		// ダイアログを設定して、表示する。
 		this.mAlertDialog = new AlertDialog.Builder(this).setMessage(message)
 				.setCancelable(false)
-				.setPositiveButton(doneBtn, mCloseBtnOnClickListener).create();
+				.setPositiveButton(doneBtn, onClickListener).create();
 		this.mAlertDialog.show();
 	}
 

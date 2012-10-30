@@ -2,14 +2,15 @@ package org.dyndns.datsnet.myflickr.task;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 
 import org.dyndns.datsnet.myflickr.BaseActivity;
 import org.dyndns.datsnet.myflickr.FlickrActivity;
 import org.dyndns.datsnet.myflickr.helper.FlickrHelper;
+import org.dyndns.datsnet.myflickr.utils.BitmapUtils;
 import org.xml.sax.SAXException;
 
 import android.app.ProgressDialog;
@@ -17,6 +18,9 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnCancelListener;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Bitmap.CompressFormat;
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -26,7 +30,8 @@ import com.googlecode.flickrjandroid.oauth.OAuth;
 import com.googlecode.flickrjandroid.uploader.UploadMetaData;
 import com.googlecode.flickrjandroid.uploader.Uploader;
 
-public class ImageUploadTask extends AsyncTask<Void, Integer, ArrayList<String>> {
+public class ImageUploadTask extends
+		AsyncTask<Void, Integer, ArrayList<String>> {
 
 	private Uploader uploader;;
 	private Context context;
@@ -34,6 +39,7 @@ public class ImageUploadTask extends AsyncTask<Void, Integer, ArrayList<String>>
 	private OAuth oauth;
 	private FlickrActivity activity;
 	private ArrayList<File> files;
+	private boolean isFailed = false;
 
 	public ImageUploadTask(ArrayList<File> files, OAuth oauth, Context context) {
 		this.files = files;
@@ -42,11 +48,12 @@ public class ImageUploadTask extends AsyncTask<Void, Integer, ArrayList<String>>
 		this.context = context;
 		this.activity = (FlickrActivity) context;
 	}
-    @Override
-    protected void onProgressUpdate(Integer... progress) {
-//    	mProgressDialog.setProgress(progress[0]);
-    	mProgressDialog.incrementProgressBy(progress[0]);
-    }
+
+	@Override
+	protected void onProgressUpdate(Integer... progress) {
+		// mProgressDialog.setProgress(progress[0]);
+		mProgressDialog.incrementProgressBy(progress[0]);
+	}
 
 	@Override
 	protected void onPreExecute() {
@@ -56,15 +63,15 @@ public class ImageUploadTask extends AsyncTask<Void, Integer, ArrayList<String>>
 		// dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
 		// dialog.show();
 		super.onPreExecute();
-//		mProgressDialog = ProgressDialog.show(this.context, "通信中", "Now Loading..."); //$NON-NLS-1$ //$NON-NLS-2$
+		//		mProgressDialog = ProgressDialog.show(this.context, "通信中", "Now Loading..."); //$NON-NLS-1$ //$NON-NLS-2$
 
 		mProgressDialog = new ProgressDialog(this.context);
 		mProgressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
 		mProgressDialog.setIndeterminate(false);
 
 		mProgressDialog.setTitle("通信中");
-		mProgressDialog.setMessage("Now updating...");
-		mProgressDialog.setCanceledOnTouchOutside(true);
+		mProgressDialog.setMessage("Now uploading...");
+//		mProgressDialog.setCanceledOnTouchOutside(true);
 		mProgressDialog.setCancelable(true);
 		mProgressDialog.setOnCancelListener(new OnCancelListener() {
 			@Override
@@ -72,8 +79,8 @@ public class ImageUploadTask extends AsyncTask<Void, Integer, ArrayList<String>>
 				ImageUploadTask.this.cancel(true);
 			}
 		});
-		mProgressDialog.show();
 
+		mProgressDialog.show();
 
 	}
 
@@ -89,8 +96,16 @@ public class ImageUploadTask extends AsyncTask<Void, Integer, ArrayList<String>>
 		}
 
 		if (results != null) {
+			if (results.size() == 0) {
+				// １つもアップロードできなかった場合
+				this.activity.uploadFailed();
+				return;
+			} else if(isFailed) {
+				// エラーがあった場合
+				this.activity.finishActivityWidthDialog(results.get(0));
+				return;
+			}
 			this.activity.uploadDone(this.oauth, results);
-
 		}
 
 	}
@@ -102,50 +117,57 @@ public class ImageUploadTask extends AsyncTask<Void, Integer, ArrayList<String>>
 		ArrayList<String> results = new ArrayList<String>();
 		UploadMetaData uploadMetaData = setMetaUploadData();
 
-//		int fileSize = 0;
-//		for (int i = 0, listSize = this.files.size(); i < listSize; i++) {
-//			fileSize += this.files.get(i).length();
-//		}
+		// int fileSize = 0;
+		// for (int i = 0, listSize = this.files.size(); i < listSize; i++) {
+		// fileSize += this.files.get(i).length();
+		// }
 
-		for (File targetFile : this.files) {
-			String fileName = targetFile.getName();
-			InputStream in = null;
-			try {
-				in = new FileInputStream(targetFile);
+		try {
+			for (File targetFile : this.files) {
+				// リサイズ
+				String dst = "tmp.jpg";
+				OutputStream output = this.activity.openFileOutput(dst,
+						Context.MODE_PRIVATE);
+				BitmapFactory.Options options = new BitmapFactory.Options();
+				options.inJustDecodeBounds = true;
+				BitmapFactory.decodeFile(targetFile.getAbsolutePath(), options);
+				options.inSampleSize = BitmapUtils.calculateInSampleSize(options, context);
+				options.inJustDecodeBounds = false;
+				Bitmap bm = BitmapFactory.decodeFile(targetFile.getAbsolutePath(), options);
+				bm.compress(CompressFormat.JPEG, 100, output);
+				bm.recycle();
+				
+				
+				String fileName = targetFile.getName();
+				InputStream in = null;
+//				in = new FileInputStream(targetFile);
+				in = this.activity.openFileInput(dst);
 
 				if (in != null) {
 
-					try {
-						String result = uploader.upload(fileName, in, uploadMetaData);
-						results.add(result);
+					String result = uploader.upload(fileName, in,
+							uploadMetaData);
+					results.add(result);
 
-					} catch (IOException e) {
-						// TODO 自動生成された catch ブロック
-						e.printStackTrace();
-					} catch (FlickrException e) {
-						// TODO 自動生成された catch ブロック
-						e.printStackTrace();
-					} catch (SAXException e) {
-						// TODO 自動生成された catch ブロック
-						e.printStackTrace();
-					}
 				}
 				in.close();
 
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-			} catch (IOException e) {
-				// TODO 自動生成された catch ブロック
-				e.printStackTrace();
+				// プログレスダイアログ更新
+				int progress = 100 / (this.files.size() + count);
+				Log.i("progress", String.valueOf(progress));
+				publishProgress(progress);
+
+				count++;
 			}
-
-			// プログレスダイアログ更新
-			int progress = 100 / (this.files.size() + count);
-			Log.i("progress", String.valueOf(progress));
-			publishProgress(progress);
-
-
-			count++;
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (FlickrException e) {
+			results.add(e.getErrorMessage());
+			isFailed = true;
+			e.printStackTrace();
+		} catch (SAXException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 
 		publishProgress(100);
@@ -156,7 +178,8 @@ public class ImageUploadTask extends AsyncTask<Void, Integer, ArrayList<String>>
 	 * @return
 	 */
 	private UploadMetaData setMetaUploadData() {
-		SharedPreferences sp = this.context.getSharedPreferences(BaseActivity.PREFS_NAME, Context.MODE_PRIVATE);
+		SharedPreferences sp = this.context.getSharedPreferences(
+				BaseActivity.PREFS_NAME, Context.MODE_PRIVATE);
 		int releaseValue = sp.getInt(BaseActivity.Release_FLAG_PREFERENCE, 0);
 		UploadMetaData uploadMetaData = new UploadMetaData();
 

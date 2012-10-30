@@ -49,6 +49,12 @@ public class PassImageActivity extends BaseActivity {
 		} else if (data.getExtras().get(INTENT_SELECT_IMAGE) != null) {
 			// 画像選択から選択した場合
 			imageUriList = (ArrayList<Uri>) data.getExtras().get(INTENT_SELECT_IMAGE);
+		} else if (data.getExtras().get(URI_LIST_KEY) != null) {
+			// アプリからギャラリーを起動して選択した場合
+			imageUriList.add(Uri.parse((String) data.getExtras().get(URI_LIST_KEY)));
+		} else {
+			showDefaultDialog("画像を取得できませんでした。", null);
+			return;
 		}
 
 		// intent.putExtras(getIntent());

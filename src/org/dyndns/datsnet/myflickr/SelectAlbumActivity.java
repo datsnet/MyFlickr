@@ -131,29 +131,11 @@ public class SelectAlbumActivity extends BaseActivity {
 	protected OnItemClickListener mOnItemClickListener = new OnItemClickListener() {
 
 		@Override
-		public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-			SelectImageBindData data = (SelectImageBindData) parent.getItemAtPosition(position);
-			ViewGroup viewGroup = (ViewGroup) view;
-			ImageView selectedThumbView = (ImageView) viewGroup.getChildAt(1);
-			if (!data.isSelected()) {
-				data.setSelected(true);
-
-				SelectAlbumActivity.this.selectedDataList.add(data);
-
-				selectedThumbView.setImageResource(android.R.drawable.presence_online);
-//				selectedThumbView.setImageResource(R.drawable.selected_badge);
-			} else {
-				data.setSelected(false);
-				selectedThumbView.setImageBitmap(null);
-
-				for (int i = 0, size = SelectAlbumActivity.this.selectedDataList.size(); i < size; i++) {
-					if (data.getUri().toString().equals(SelectAlbumActivity.this.selectedDataList.get(i).getUri().toString())) {
-						SelectAlbumActivity.this.selectedDataList.remove(i);
-						break;
-					}
-				}
-
-			}
+		public void onItemClick(AdapterView<?> parent, View view, int position, long id) {			
+			Intent intent = new Intent(mContext, SelectImageActivity.class);
+			setResult(0);
+			startActivity(intent);
+			
 		}
 
 	};
@@ -186,7 +168,7 @@ public class SelectAlbumActivity extends BaseActivity {
 			for (int i = 0; i < size; i++) {
 				uriList.add(SelectAlbumActivity.this.selectedDataList.get(i).getUri());
 			}
-			Toast.makeText(mContext, "選択した画像" + uriList.toString(), Toast.LENGTH_LONG).show();
+//			Toast.makeText(mContext, "選択した画像" + uriList.toString(), Toast.LENGTH_LONG).show();
 
 			Intent intent = new Intent(mContext, PassImageActivity.class);
 			intent.putExtra(INTENT_SELECT_IMAGE, uriList);

@@ -39,7 +39,6 @@ public class SelectImageActivity extends BaseActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_select_image);
 		mContext = this;
-
 		// 画像キャッシュクリア
 		ImageCache.clearCache();
 
@@ -103,8 +102,8 @@ public class SelectImageActivity extends BaseActivity {
 
 				SelectImageActivity.this.selectedDataList.add(data);
 
-//				selectedThumbView.setImageResource(android.R.drawable.presence_online);
-				selectedThumbView.setImageResource(R.drawable.selected_badge);
+				selectedThumbView.setImageResource(android.R.drawable.presence_online);
+//				selectedThumbView.setImageResource(R.drawable.selected_badge);
 			} else {
 				data.setSelected(false);
 				selectedThumbView.setImageBitmap(null);
@@ -149,7 +148,7 @@ public class SelectImageActivity extends BaseActivity {
 			for (int i = 0; i < size; i++) {
 				uriList.add(SelectImageActivity.this.selectedDataList.get(i).getUri());
 			}
-			Toast.makeText(mContext, "選択した画像" + uriList.toString(), Toast.LENGTH_LONG).show();
+//			Toast.makeText(mContext, "選択した画像" + uriList.toString(), Toast.LENGTH_LONG).show();
 
 			Intent intent = new Intent(mContext, PassImageActivity.class);
 			intent.putExtra(INTENT_SELECT_IMAGE, uriList);

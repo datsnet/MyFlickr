@@ -17,6 +17,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnClickListener;
 import android.os.AsyncTask;
 
 import com.googlecode.flickrjandroid.Flickr;
@@ -62,7 +64,7 @@ public class PhotoAccessTask extends AsyncTask<String, Integer, ArrayList<String
 				// TODO 自動生成された catch ブロック
 				e.printStackTrace();
 			} catch (FlickrException e) {
-				// TODO 自動生成された catch ブロック
+				urlList.add(e.getErrorMessage());
 				e.printStackTrace();
 			} catch (JSONException e) {
 				// TODO 自動生成された catch ブロック
@@ -79,9 +81,16 @@ public class PhotoAccessTask extends AsyncTask<String, Integer, ArrayList<String
 
 	@Override
 	protected void onPostExecute(ArrayList<String> target) {
+		if (target == null) {
+			return;
+		}
 		if (activity != null) {
 			HashMap<String, String> urlList = new HashMap<String, String>();
-
+			if (!target.get(0).startsWith("http")) {
+				this.activity.finishActivityWidthDialog(target.get(0));
+				return;
+			}
+			
 			// メール
 			urlList.put(BaseActivity.KEY_DIALOG_SEND_MAIL, StringUtils.sendForm(target));
 			// ブラウザ
